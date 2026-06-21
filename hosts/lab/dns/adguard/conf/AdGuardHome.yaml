@@ -148,7 +148,7 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: '*.lab.skynet'
+    - domain: '*.lab.skywt'
       answer: 100.64.0.2
       enabled: true
   safe_fs_patterns: []

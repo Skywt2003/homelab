@@ -27,7 +27,7 @@ services:
       - /data/homelab/lab/adguard/work:/opt/adguardhome/work
       - ./adguard/conf:/opt/adguardhome/conf
     labels:
-      caddy: http://dns.lab.skynet
+      caddy: http://dns.lab.skywt
       caddy.reverse_proxy: "{{upstreams 80}}"
 
 networks:

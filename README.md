@@ -4,7 +4,7 @@ Centralized configuration for lab infrastructure.
 
 ## Layout
 
-- `hosts/lab/dns`: DNS stack for `dns.lab.skynet`.
+- `hosts/lab/dns`: DNS stack for `dns.lab.skywt`.
 - `hosts/lab/caddy`: Caddy notes for routes owned by the lab host.
 - `hosts/dev`: placeholder for other hosts.
 - `shared`: shared scripts, templates, and common configuration.
