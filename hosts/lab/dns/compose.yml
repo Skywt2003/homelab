@@ -1,0 +1,35 @@
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:2.9-alpine
+    container_name: lab-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      CADDY_INGRESS_NETWORKS: lab-proxy
+    networks:
+      - lab-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../caddy/data:/data
+      - ../caddy/config:/config
+
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: lab-adguard
+    restart: unless-stopped
+    ports:
+      - "100.64.0.2:53:53/tcp"
+      - "100.64.0.2:53:53/udp"
+    networks:
+      - lab-proxy
+    volumes:
+      - ./adguard/work:/opt/adguardhome/work
+      - ./adguard/conf:/opt/adguardhome/conf
+    labels:
+      caddy: http://dns.lab.skynet
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+networks:
+  lab-proxy:
+    name: lab-proxy
