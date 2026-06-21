@@ -1,0 +1,19 @@
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:2.9-alpine
+    container_name: lab-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      CADDY_INGRESS_NETWORKS: lab-proxy
+    networks:
+      - lab-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /data/homelab/lab/caddy/data:/data
+      - /data/homelab/lab/caddy/config:/config
+
+networks:
+  lab-proxy:
+    name: lab-proxy
