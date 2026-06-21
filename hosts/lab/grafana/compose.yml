@@ -1,0 +1,19 @@
+services:
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: lab-grafana
+    restart: unless-stopped
+    environment:
+      GF_SERVER_DOMAIN: grafana.lab.skywt
+      GF_SERVER_ROOT_URL: http://grafana.lab.skywt/
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/grafana/data:/var/lib/grafana
+    labels:
+      caddy: http://grafana.lab.skywt
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  lab-proxy:
+    external: true
