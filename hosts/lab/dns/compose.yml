@@ -11,8 +11,8 @@ services:
       - lab-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../caddy/data:/data
-      - ../caddy/config:/config
+      - /data/homelab/lab/caddy/data:/data
+      - /data/homelab/lab/caddy/config:/config
 
   adguard:
     image: adguard/adguardhome:latest
@@ -24,7 +24,7 @@ services:
     networks:
       - lab-proxy
     volumes:
-      - ./adguard/work:/opt/adguardhome/work
+      - /data/homelab/lab/adguard/work:/opt/adguardhome/work
       - ./adguard/conf:/opt/adguardhome/conf
     labels:
       caddy: http://dns.lab.skynet
