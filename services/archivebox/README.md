@@ -14,7 +14,7 @@ Runtime state is stored outside this Git repository:
 
 ```bash
 sudo mkdir -p /data/homelab/lab/archivebox/data
-cd ~/homelab/hosts/lab/archivebox
+cd ~/homelab/services/archivebox
 sudo docker compose -f compose.yml run --rm archivebox init
 sudo docker compose -f compose.yml up -d
 ```

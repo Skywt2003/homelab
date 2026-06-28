@@ -1,3 +1,3 @@
 .DS_Store
-hosts/lab/system-monitoring/.env
-hosts/lab/system-monitoring/.env.*
+services/system-monitoring/.env
+services/system-monitoring/.env.local

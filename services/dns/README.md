@@ -14,7 +14,15 @@ permissions on it. Keep the writable config under `/data`.
 
 The Git-maintained template is:
 
-- `hosts/lab/dns/adguard/conf/AdGuardHome.yaml.template`
+- `services/dns/adguard/conf/AdGuardHome.yaml.template`
 
 Use it to bootstrap a new runtime config, then update the admin password hash
 before starting AdGuard Home.
+
+
+## Local rewrites
+
+The maintained AdGuard template includes these local wildcard rewrites:
+
+- `*.lab.skywt` -> `100.64.0.2` for services on this `lab` host.
+- `*.dev.skywt` -> `100.64.0.5` for development projects on the separate `dev` host. The projects themselves are not managed by this repository.

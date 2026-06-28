@@ -15,6 +15,6 @@ Runtime state is stored outside this Git repository:
 ```bash
 sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
-cd ~/homelab/hosts/lab/gitea
+cd ~/homelab/services/gitea
 sudo docker compose -f compose.yml up -d
 ```

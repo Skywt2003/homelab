@@ -12,7 +12,7 @@ Runtime image storage is stored outside this Git repository:
 
 ```bash
 sudo mkdir -p /data/homelab/lab/docker-registry/data
-cd ~/homelab/hosts/lab/docker-registry
+cd ~/homelab/services/docker-registry
 sudo docker compose -f compose.yml up -d
 ```
 

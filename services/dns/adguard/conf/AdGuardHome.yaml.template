@@ -154,7 +154,6 @@ filtering:
     - domain: '*.dev.skywt'
       answer: 100.64.0.5
       enabled: true
-  safe_fs_patterns: []
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576

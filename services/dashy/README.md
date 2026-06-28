@@ -12,6 +12,6 @@ The `web-icons/` assets also replace Dashy's default PWA and Safari home-screen 
 ## Deploy
 
 ```bash
-cd ~/homelab/hosts/lab/dashy
+cd ~/homelab/services/dashy
 sudo docker compose -f compose.yml up -d
 ```

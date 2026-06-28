@@ -16,6 +16,6 @@ Runtime state is stored outside this Git repository:
 
 ```bash
 sudo mkdir -p /data/homelab/lab/rsshub/redis
-cd ~/homelab/hosts/lab/rsshub
+cd ~/homelab/services/rsshub
 sudo docker compose -f compose.yml up -d
 ```

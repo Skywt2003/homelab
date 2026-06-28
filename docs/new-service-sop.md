@@ -5,7 +5,7 @@ This SOP describes how to add and deploy a new service on the `lab` host.
 ## Assumptions
 
 - Services run with Docker Compose.
-- One service stack lives under `hosts/lab/<service>/`.
+- One service stack lives under `services/<service>/`.
 - Public HTTPS access is handled by the shared Caddy Docker proxy stack.
 - Service routes use the shared external Docker network `lab-proxy`.
 - Local lab domains use `*.lab.skywt`, currently resolved by AdGuard Home.
@@ -28,7 +28,7 @@ Use HTTPS URLs. Lab domains terminate TLS through Caddy's internal CA.
 Create the service directory:
 
 ```bash
-mkdir -p hosts/lab/<service>
+mkdir -p services/<service>
 ```
 
 The normal files are:
@@ -78,14 +78,14 @@ sudo chown -R <uid>:<gid> /data/homelab/lab/<service>
 
 Document the path in both:
 
-- `hosts/lab/<service>/README.md`
+- `services/<service>/README.md`
 - root `README.md` under `Runtime Data`
 
 Skip this step for read-only or stateless services.
 
 ## 5. Update Dashy Index
 
-Add the new service to `hosts/lab/dashy/conf.yml`:
+Add the new service to `services/dashy/conf.yml`:
 
 ```yaml
 - title: <Display Name>
@@ -100,7 +100,7 @@ For infrastructure components without a web UI, add a non-clickable item and set
 After changing Dashy config, reload Dashy:
 
 ```bash
-cd ~/homelab/hosts/lab/dashy
+cd ~/homelab/services/dashy
 sudo docker compose -f compose.yml restart dashy
 ```
 
@@ -112,7 +112,7 @@ Update root `README.md`:
 - Add runtime data paths if any.
 - Add a deploy section for the service.
 
-Add `hosts/lab/<service>/README.md` with:
+Add `services/<service>/README.md` with:
 
 - What the service does.
 - Which domain exposes it.
@@ -125,7 +125,7 @@ Add `hosts/lab/<service>/README.md` with:
 Before deploying, make Docker Compose render the final config:
 
 ```bash
-cd ~/homelab/hosts/lab/<service>
+cd ~/homelab/services/<service>
 docker compose -f compose.yml config
 ```
 
@@ -136,7 +136,7 @@ Fix any YAML, network, mount, or label issues before continuing.
 Deploy from the service directory:
 
 ```bash
-cd ~/homelab/hosts/lab/<service>
+cd ~/homelab/services/<service>
 sudo docker compose -f compose.yml up -d
 ```
 
@@ -196,10 +196,10 @@ git diff
 
 The expected changes for a new service are usually:
 
-- `hosts/lab/<service>/compose.yml`
-- `hosts/lab/<service>/README.md`
-- Service config files under `hosts/lab/<service>/`
-- `hosts/lab/dashy/conf.yml`
+- `services/<service>/compose.yml`
+- `services/<service>/README.md`
+- Service config files under `services/<service>/`
+- `services/dashy/conf.yml`
 - root `README.md`
 
 Avoid mixing unrelated changes into the same commit.

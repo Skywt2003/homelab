@@ -79,7 +79,7 @@ services:
     restart: unless-stopped
     environment:
       MIHOMO_API_URL: http://100.64.0.7:9090
-      MIHOMO_API_TOKEN: ${MIHOMO_API_TOKEN:?set MIHOMO_API_TOKEN in hosts/lab/system-monitoring/.env}
+      MIHOMO_API_TOKEN: ${MIHOMO_API_TOKEN:?set MIHOMO_API_TOKEN in services/system-monitoring/.env}
       SCRAPE_INTERVAL: 5s
       LATENCY_INTERVAL: 60s
       METRIC_PREFIX: mihomo

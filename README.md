@@ -1,31 +1,31 @@
 # Homelab
 
-Centralized configuration for lab infrastructure.
+Configuration for services running on the `lab` host only.
+
+This repository intentionally no longer manages `dev` host projects. Development projects on `dev` are expected to be run and exposed independently from this Docker-based lab service layout.
 
 ## Layout
 
-- `docs`: operating procedures and maintenance notes.
-- `hosts/lab/dns`: DNS stack for `dns.lab.skywt`.
-- `hosts/lab/caddy`: Caddy notes for routes owned by the lab host.
-- `hosts/lab/ca`: certificate installation guide for `ca.lab.skywt`.
-- `hosts/lab/archivebox`: ArchiveBox stack for `archive.lab.skywt`.
-- `hosts/lab/dashy`: Dashy service index for `index.lab.skywt`.
-- `hosts/lab/gitea`: Gitea stack for `git.lab.skywt`.
-- `hosts/lab/grafana`: Grafana stack for `grafana.lab.skywt`.
-- `hosts/lab/system-monitoring`: Prometheus-based host, container, and Mihomo proxy monitoring stack.
-- `hosts/lab/rsshub`: RSSHub stack for `rsshub.lab.skywt`.
-- `hosts/lab/docker-registry`: Docker Registry stack for `docker.lab.skywt`.
-- `hosts/dev`: placeholder for other hosts.
-- `shared`: shared scripts, templates, and common configuration.
+- `services/archivebox`: ArchiveBox for `archive.lab.skywt`.
+- `services/ca`: certificate installation guide for `ca.lab.skywt`.
+- `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
+- `services/dashy`: Dashy service index for `index.lab.skywt`.
+- `services/dns`: AdGuard Home DNS stack for `dns.lab.skywt`.
+- `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
+- `services/gitea`: Gitea for `git.lab.skywt`.
+- `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
+- `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
+- `docs`: operating procedures and audit notes.
 
 ## SOPs
 
 - [New Service SOP](docs/new-service-sop.md)
-- [Dev Project Exposure SOP](docs/dev-project-exposure-sop.md)
+- [Service Status Audit](docs/service-status-audit.md)
 
 ## Runtime Data
 
-Runtime state that is not manually maintained in Git lives under `/data/homelab/lab` on the `lab` host.
+Mutable runtime state is not maintained in Git. It lives under `/data/homelab/lab` on the `lab` host.
 
 Current paths:
 
@@ -34,85 +34,42 @@ Current paths:
 - `/data/homelab/lab/archivebox/data`
 - `/data/homelab/lab/caddy/data`
 - `/data/homelab/lab/caddy/config`
+- `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
+- `/data/homelab/lab/rsshub/redis`
 - `/data/homelab/lab/system-monitoring/prometheus`
 - `/data/homelab/lab/system-monitoring/alertmanager`
-- `/data/homelab/lab/rsshub/redis`
-- `/data/homelab/lab/docker-registry/data`
 
-## Deploy DNS
+## Deploy
+
+Each stack is deployed from its directory:
 
 ```bash
-cd ~/homelab/hosts/lab/dns
+cd ~/homelab/services/<service>
 sudo docker compose -f compose.yml up -d
 ```
 
-## Deploy CA Guide
-
-```bash
-cd ~/homelab/hosts/lab/ca
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy Dashy
-
-```bash
-cd ~/homelab/hosts/lab/dashy
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy ArchiveBox
+Services with first-run data directories may need preparation:
 
 ```bash
 sudo mkdir -p /data/homelab/lab/archivebox/data
-cd ~/homelab/hosts/lab/archivebox
+sudo mkdir -p /data/homelab/lab/docker-registry/data
+sudo mkdir -p /data/homelab/lab/gitea/data
+sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
+sudo mkdir -p /data/homelab/lab/grafana/data
+sudo chown -R 472:472 /data/homelab/lab/grafana/data
+sudo mkdir -p /data/homelab/lab/rsshub/redis
+sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
+sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
+```
+
+ArchiveBox still requires initialization before the first normal start:
+
+```bash
+cd ~/homelab/services/archivebox
 sudo docker compose -f compose.yml run --rm archivebox init
 sudo docker compose -f compose.yml up -d
 ```
 
-## Deploy Gitea
-
-```bash
-sudo mkdir -p /data/homelab/lab/gitea/data
-sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
-cd ~/homelab/hosts/lab/gitea
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy Grafana
-
-```bash
-sudo mkdir -p /data/homelab/lab/grafana/data
-sudo chown -R 472:472 /data/homelab/lab/grafana/data
-cd ~/homelab/hosts/lab/grafana
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy System Monitoring
-
-Mihomo proxy monitoring is integrated into this stack. Configure `hosts/lab/system-monitoring/.env` from `.env.example` before deployment when enabling the exporter.
-
-
-```bash
-sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
-sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
-cd ~/homelab/hosts/lab/system-monitoring
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy RSSHub
-
-```bash
-sudo mkdir -p /data/homelab/lab/rsshub/redis
-cd ~/homelab/hosts/lab/rsshub
-sudo docker compose -f compose.yml up -d
-```
-
-## Deploy Docker Registry
-
-```bash
-sudo mkdir -p /data/homelab/lab/docker-registry/data
-cd ~/homelab/hosts/lab/docker-registry
-sudo docker compose -f compose.yml up -d
-```
+System monitoring reads the Mihomo exporter token from `services/system-monitoring/.env`; create it from `.env.example` before deploying that stack.

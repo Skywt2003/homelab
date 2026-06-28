@@ -3,7 +3,7 @@
 This stack runs the system-monitoring part of the Prometheus stack for the `lab` host.
 
 It intentionally does **not** run Grafana. Grafana is maintained as the independent
-`hosts/lab/grafana` project so it can also be used for non-system-monitoring data.
+`services/grafana` project so it can also be used for non-system-monitoring data.
 This stack only provides metrics collection, storage, push metrics, and alert routing.
 
 ## Components
@@ -38,14 +38,14 @@ Grafana dashboard catalog.
 ```bash
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
-cd ~/homelab/hosts/lab/system-monitoring
+cd ~/homelab/services/system-monitoring
 sudo docker compose -f compose.yml up -d
 ```
 
 ## Validate and operate
 
 ```bash
-cd ~/homelab/hosts/lab/system-monitoring
+cd ~/homelab/services/system-monitoring
 docker compose -f compose.yml config
 sudo docker compose -f compose.yml ps
 sudo docker logs --tail 80 lab-prometheus
@@ -78,4 +78,4 @@ Components:
 
 The exporter runs on `lab` and reads Mihomo's External Controller on the `proxy` Tailscale address `http://100.64.0.7:9090`. The controller is protected by Mihomo's `secret`, and metrics are stored in Prometheus on `lab`.
 
-Runtime secret configuration is kept out of Git in `hosts/lab/system-monitoring/.env`. Use `hosts/lab/system-monitoring/.env.example` as the template.
+Runtime secret configuration is kept out of Git in `services/system-monitoring/.env`. Use `services/system-monitoring/.env.example` as the template.

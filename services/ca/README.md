@@ -15,6 +15,6 @@ from the same runtime directory.
 ## Deploy
 
 ```bash
-cd ~/homelab/hosts/lab/ca
+cd ~/homelab/services/ca
 sudo docker compose -f compose.yml up -d
 ```
