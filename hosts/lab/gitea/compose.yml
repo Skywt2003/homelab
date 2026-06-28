@@ -1,0 +1,28 @@
+services:
+  gitea:
+    image: docker.gitea.com/gitea:latest
+    container_name: lab-gitea
+    restart: unless-stopped
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      GITEA__server__DOMAIN: git.lab.skywt
+      GITEA__server__ROOT_URL: https://git.lab.skywt/
+      GITEA__server__SSH_DOMAIN: git.lab.skywt
+      GITEA__server__SSH_PORT: 2222
+    ports:
+      - "2222:22"
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/gitea/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      caddy: git.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  lab-proxy:
+    external: true

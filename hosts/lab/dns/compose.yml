@@ -10,9 +10,10 @@ services:
       - lab-proxy
     volumes:
       - /data/homelab/lab/adguard/work:/opt/adguardhome/work
-      - ./adguard/conf:/opt/adguardhome/conf
+      - /data/homelab/lab/adguard/conf:/opt/adguardhome/conf
     labels:
-      caddy: http://dns.lab.skywt
+      caddy: dns.lab.skywt
+      caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
 
 networks:

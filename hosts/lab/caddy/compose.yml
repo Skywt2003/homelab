@@ -3,14 +3,17 @@ services:
     image: lucaslorentz/caddy-docker-proxy:2.9-alpine
     container_name: lab-caddy
     restart: unless-stopped
+    command: docker-proxy --caddyfile-path /etc/caddy/acme-server.Caddyfile
     ports:
       - "80:80"
+      - "443:443"
     environment:
       CADDY_INGRESS_NETWORKS: lab-proxy
     networks:
       - lab-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme-server.Caddyfile:/etc/caddy/acme-server.Caddyfile:ro
       - /data/homelab/lab/caddy/data:/data
       - /data/homelab/lab/caddy/config:/config
 

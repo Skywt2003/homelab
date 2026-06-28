@@ -1,0 +1,24 @@
+services:
+  dashy:
+    image: lissy93/dashy:latest
+    container_name: lab-dashy
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    networks:
+      - lab-proxy
+    volumes:
+      - ./conf.yml:/app/user-data/conf.yml:ro
+      - ./assets/web-icons:/app/dist/web-icons:ro
+      - ./assets/manifest.webmanifest:/app/dist/manifest.webmanifest:ro
+      - ./assets/web-icons/apple-touch-icon.png:/app/dist/apple-touch-icon.png:ro
+      - ./assets/web-icons/apple-touch-icon-precomposed.png:/app/dist/apple-touch-icon-precomposed.png:ro
+      - ./assets/web-icons/favicon.ico:/app/dist/favicon.ico:ro
+    labels:
+      caddy: index.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+networks:
+  lab-proxy:
+    external: true

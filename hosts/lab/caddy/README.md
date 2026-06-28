@@ -2,7 +2,7 @@
 
 This stack runs the shared reverse proxy for the `lab` host.
 
-Routes are managed by Docker labels on other Compose stacks. For example, the DNS stack publishes AdGuard Home at `http://dns.lab.skywt`.
+Routes are managed by Docker labels on other Compose stacks. For example, the DNS stack publishes AdGuard Home at `https://dns.lab.skywt`.
 
 Caddy owns the shared Docker network:
 

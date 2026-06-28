@@ -1,0 +1,22 @@
+services:
+  archivebox:
+    image: archivebox/archivebox:latest
+    container_name: lab-archivebox
+    restart: unless-stopped
+    environment:
+      BASE_URL: https://archive.lab.skywt
+      SERVER_SECURITY_MODE: safe-onedomain-nojsreplay
+      PUBLIC_ADD_VIEW: "False"
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/archivebox/data:/data
+    shm_size: 1gb
+    labels:
+      caddy: archive.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8000}}"
+
+networks:
+  lab-proxy:
+    external: true

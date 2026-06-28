@@ -1,0 +1,77 @@
+pageInfo:
+  title: HomeLab
+  description: ""
+  logo: /web-icons/homelab-server.svg
+  favicon: /web-icons/homelab-server.svg
+  navLinks: []
+appConfig:
+  theme: nord
+  layout: auto
+  iconSize: medium
+  language: en
+  statusCheck: true
+  statusCheckInterval: 60
+  hideComponents:
+    hideNav: true
+    hideSearch: true
+sections:
+  - name: Lab Services
+    icon: fas fa-server
+    items:
+      - title: Dashy
+        description: Homelab service index
+        icon: hl-dashy
+        url: https://index.lab.skywt
+        statusCheck: true
+      - title: AdGuard Home
+        description: DNS filtering and local lab DNS
+        icon: hl-adguardhome
+        url: https://dns.lab.skywt
+        statusCheck: true
+      - title: Grafana
+        description: Metrics dashboards and observability
+        icon: hl-grafana
+        url: https://grafana.lab.skywt
+        statusCheck: true
+      - title: Prometheus
+        description: System monitoring metrics and query UI
+        icon: hl-prometheus
+        url: https://prometheus.lab.skywt
+        statusCheck: true
+      - title: Alertmanager
+        description: System monitoring alert routing
+        icon: hl-prometheus
+        url: https://alertmanager.lab.skywt
+        statusCheck: true
+      - title: ArchiveBox
+        description: Web page archiving and replay
+        icon: hl-archivebox
+        url: https://archive.lab.skywt
+        statusCheck: true
+      - title: Gitea
+        description: Self-hosted Git repositories
+        icon: hl-gitea
+        url: https://git.lab.skywt
+        statusCheck: true
+      - title: RSSHub
+        description: RSS feed generator with Chromium rendering
+        icon: hl-rsshub
+        url: https://rsshub.lab.skywt
+        statusCheck: true
+      - title: Docker Registry
+        description: Private image push and pull registry
+        icon: fab fa-docker
+        url: https://docker.lab.skywt/v2/
+        statusCheck: true
+      - title: CA Guide
+        description: Internal certificate installation guide
+        icon: hl-caddy
+        url: https://ca.lab.skywt
+        statusCheck: true
+  - name: Infrastructure
+    icon: fas fa-network-wired
+    items:
+      - title: Caddy
+        description: Shared reverse proxy for lab services
+        icon: hl-caddy
+        statusCheck: false

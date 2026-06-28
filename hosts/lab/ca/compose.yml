@@ -1,0 +1,20 @@
+services:
+  ca:
+    image: caddy:2-alpine
+    container_name: lab-ca
+    restart: unless-stopped
+    command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+    networks:
+      - lab-proxy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/srv/site:ro
+      - /data/homelab/lab/caddy/data:/srv/caddy-data:ro
+    labels:
+      caddy: ca.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+networks:
+  lab-proxy:
+    external: true

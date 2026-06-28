@@ -1,0 +1,26 @@
+services:
+  docker-registry:
+    image: registry:2
+    container_name: lab-docker-registry
+    restart: unless-stopped
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_HTTP_SECRET: REDACTED
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/docker-registry/data:/var/lib/registry
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:5000/v2/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      caddy: docker.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5000}}"
+
+networks:
+  lab-proxy:
+    external: true

@@ -1,0 +1,116 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: lab-prometheus
+    restart: unless-stopped
+    user: root
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=1y
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    networks:
+      - lab-proxy
+      - system-monitoring
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+      - /data/homelab/lab/system-monitoring/prometheus:/prometheus
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    labels:
+      caddy: prometheus.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9090}}"
+    logging: &default-logging
+      driver: json-file
+      options:
+        max-size: 1m
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: lab-node-exporter
+    restart: unless-stopped
+    command:
+      - --path.procfs=/host/proc
+      - --path.rootfs=/rootfs
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|run/docker/netns|var/lib/docker/.+)($$|/)
+    networks:
+      - system-monitoring
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro,rslave
+    logging: *default-logging
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: lab-cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    networks:
+      - system-monitoring
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    logging: *default-logging
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: lab-pushgateway
+    restart: unless-stopped
+    networks:
+      - system-monitoring
+    logging: *default-logging
+
+  mihomo-exporter:
+    build:
+      context: ./mihomo-prometheus-exporter
+    image: homelab/mihomo-prometheus-exporter:local
+    container_name: lab-mihomo-exporter
+    restart: unless-stopped
+    environment:
+      MIHOMO_API_URL: http://100.64.0.7:9090
+      MIHOMO_API_TOKEN: ${MIHOMO_API_TOKEN:?set MIHOMO_API_TOKEN in hosts/lab/system-monitoring/.env}
+      SCRAPE_INTERVAL: 5s
+      LATENCY_INTERVAL: 60s
+      METRIC_PREFIX: mihomo
+      METRICS_ENABLE_TOTAL_TRAFFIC: "true"
+      METRICS_ENABLE_NODE_AGGREGATION: "true"
+      # Destination labels can become high-cardinality; node aggregation remains enabled.
+      METRICS_ENABLE_DESTINATION_AGGREGATION: "false"
+    networks:
+      - system-monitoring
+    logging: *default-logging
+
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:latest
+    container_name: lab-alertmanager
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    networks:
+      - lab-proxy
+      - system-monitoring
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - /data/homelab/lab/system-monitoring/alertmanager:/alertmanager
+    labels:
+      caddy: alertmanager.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9093}}"
+    logging: *default-logging
+
+networks:
+  lab-proxy:
+    external: true
+  system-monitoring:

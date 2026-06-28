@@ -1,1 +1,3 @@
 .DS_Store
+hosts/lab/system-monitoring/.env
+hosts/lab/system-monitoring/.env.*

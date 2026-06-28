@@ -1,0 +1,64 @@
+services:
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: lab-rsshub
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: redis://redis:6379/
+      PLAYWRIGHT_WS_ENDPOINT: ws://browserless:3000/chromium/playwright
+    depends_on:
+      redis:
+        condition: service_healthy
+      browserless:
+        condition: service_healthy
+    networks:
+      - lab-proxy
+      - rsshub-internal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      caddy: rsshub.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 1200}}"
+
+  browserless:
+    image: ghcr.io/browserless/chromium:latest
+    container_name: lab-rsshub-browserless
+    restart: unless-stopped
+    networks:
+      - rsshub-internal
+    shm_size: 1gb
+    ulimits:
+      core:
+        hard: 0
+        soft: 0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:alpine
+    container_name: lab-rsshub-redis
+    restart: unless-stopped
+    networks:
+      - rsshub-internal
+    volumes:
+      - /data/homelab/lab/rsshub/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
+networks:
+  lab-proxy:
+    external: true
+  rsshub-internal:

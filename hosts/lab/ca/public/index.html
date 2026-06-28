@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>证书安装指南</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f7f4;
+        --text: #181a1b;
+        --muted: #5f676b;
+        --panel: #ffffff;
+        --line: #d7d9d6;
+        --accent: #176b5f;
+        --accent-text: #ffffff;
+        --code: #eef2ef;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #121416;
+          --text: #eef1ee;
+          --muted: #a9b0ad;
+          --panel: #1b1f21;
+          --line: #343a3d;
+          --accent: #59b9a9;
+          --accent-text: #07110f;
+          --code: #242a2d;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        width: min(960px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 40px 0 56px;
+      }
+
+      header {
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 5vw, 3.75rem);
+        line-height: 1.05;
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 1.35rem;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      a {
+        color: var(--accent);
+        font-weight: 650;
+      }
+
+      code {
+        border-radius: 6px;
+        background: var(--code);
+        padding: 0.12rem 0.35rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .lead {
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      .download {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        margin-top: 12px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: var(--accent-text);
+        padding: 0 18px;
+        text-decoration: none;
+      }
+
+      .notice {
+        margin: 26px 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 16px;
+      }
+
+      .tabs {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        overflow: hidden;
+      }
+
+      .tab-list {
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tab-list button {
+        min-width: 112px;
+        min-height: 48px;
+        border: 0;
+        border-right: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .tab-list button[aria-selected="true"] {
+        background: var(--accent);
+        color: var(--accent-text);
+      }
+
+      .tab-panel {
+        padding: 24px;
+      }
+
+      .tab-panel[hidden] {
+        display: none;
+      }
+
+      ol {
+        margin: 0;
+        padding-left: 1.4rem;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .footnote {
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>证书安装指南</h1>
+        <p class="lead">
+          安装并信任 HomeLab Caddy Internal CA 根证书后，设备就可以正常访问
+          <code>*.lab.skywt</code> 的 HTTPS 服务。
+        </p>
+        <a class="download" href="/root.crt" download="lab-skywt-caddy-root.crt">下载 root.crt</a>
+      </header>
+
+      <section class="notice" aria-label="安全提示">
+        <p>
+          只在你自己控制的设备上安装这张根证书。这里提供的是公开根证书，不是私钥；
+          不要分发 Caddy 数据目录里的 <code>*.key</code> 文件。
+        </p>
+      </section>
+
+      <section class="tabs">
+        <div class="tab-list" role="tablist" aria-label="操作系统">
+          <button id="tab-ios" role="tab" type="button" aria-selected="true" aria-controls="panel-ios">iOS</button>
+          <button id="tab-macos" role="tab" type="button" aria-selected="false" aria-controls="panel-macos">macOS</button>
+          <button id="tab-linux" role="tab" type="button" aria-selected="false" aria-controls="panel-linux">Linux</button>
+          <button id="tab-windows" role="tab" type="button" aria-selected="false" aria-controls="panel-windows">Windows</button>
+          <button id="tab-android" role="tab" type="button" aria-selected="false" aria-controls="panel-android">Android</button>
+        </div>
+
+        <article id="panel-ios" class="tab-panel" role="tabpanel" aria-labelledby="tab-ios">
+          <h2>iOS / iPadOS</h2>
+          <ol>
+            <li>用 Safari 打开本页，下载 <code>root.crt</code>，按提示安装描述文件。</li>
+            <li>打开“设置”，在顶部的“已下载描述文件”中完成安装。</li>
+            <li>进入“设置 -> 通用 -> 关于本机 -> 证书信任设置”。</li>
+            <li>打开对 HomeLab Caddy 根证书的完全信任。</li>
+          </ol>
+        </article>
+
+        <article id="panel-macos" class="tab-panel" role="tabpanel" aria-labelledby="tab-macos" hidden>
+          <h2>macOS</h2>
+          <ol>
+            <li>下载 <code>root.crt</code>，双击导入“钥匙串访问”。</li>
+            <li>把证书放到“系统”钥匙串，或按你的使用范围放到“登录”钥匙串。</li>
+            <li>打开证书详情，在“信任”里将 SSL 设置为“始终信任”。</li>
+            <li>重新打开浏览器，再访问 <code>https://index.lab.skywt</code> 验证。</li>
+          </ol>
+        </article>
+
+        <article id="panel-linux" class="tab-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
+          <h2>Linux</h2>
+          <ol>
+            <li>下载 <code>root.crt</code> 到本机。</li>
+            <li>Debian / Ubuntu：复制到 <code>/usr/local/share/ca-certificates/lab-skywt.crt</code>。</li>
+            <li>运行 <code>sudo update-ca-certificates</code>。</li>
+            <li>Fedora / RHEL：复制到 <code>/etc/pki/ca-trust/source/anchors/</code>，然后运行 <code>sudo update-ca-trust</code>。</li>
+          </ol>
+        </article>
+
+        <article id="panel-windows" class="tab-panel" role="tabpanel" aria-labelledby="tab-windows" hidden>
+          <h2>Windows</h2>
+          <ol>
+            <li>下载 <code>root.crt</code>。</li>
+            <li>双击证书，选择“安装证书”。</li>
+            <li>选择“本地计算机”，然后放入“受信任的根证书颁发机构”。</li>
+            <li>完成向导后，重新打开浏览器验证 HTTPS 访问。</li>
+          </ol>
+        </article>
+
+        <article id="panel-android" class="tab-panel" role="tabpanel" aria-labelledby="tab-android" hidden>
+          <h2>Android</h2>
+          <ol>
+            <li>下载 <code>root.crt</code>。</li>
+            <li>在系统设置中搜索“安装证书”或“CA 证书”。</li>
+            <li>选择下载的证书文件，并按提示设置名称和用途。</li>
+            <li>注意：部分 App 不信任用户安装的 CA，但浏览器访问通常可用。</li>
+          </ol>
+        </article>
+      </section>
+
+      <p class="footnote">
+        如果安装后仍然提示证书不可信，请确认访问地址是 <code>https://</code>，
+        并重启浏览器或相关 App。
+      </p>
+    </main>
+
+    <script>
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      function selectTab(tab) {
+        tabs.forEach((item) => {
+          item.setAttribute('aria-selected', String(item === tab));
+        });
+
+        panels.forEach((panel) => {
+          panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+        });
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => selectTab(tab));
+      });
+    </script>
+  </body>
+</html>

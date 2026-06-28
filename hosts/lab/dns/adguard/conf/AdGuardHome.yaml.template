@@ -13,7 +13,7 @@ http:
   session_ttl: 30d
 users:
   - name: admin
-    password: REDACTED
+    password: CHANGE_ME_BCRYPT_HASH
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -150,6 +150,9 @@ filtering:
   rewrites:
     - domain: '*.lab.skywt'
       answer: 100.64.0.2
+      enabled: true
+    - domain: '*.dev.skywt'
+      answer: 100.64.0.5
       enabled: true
   safe_fs_patterns: []
   safebrowsing_cache_size: 1048576

@@ -1,0 +1,92 @@
+groups:
+  - name: service-health
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} target {{ $labels.instance }} is down"
+          description: "Prometheus has not been able to scrape {{ $labels.instance }} for more than 1 minute."
+
+  - name: host-health
+    rules:
+      - alert: HostHighLoad
+        expr: node_load1 / count without (cpu, mode) (node_cpu_seconds_total{mode="idle"}) > 1.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High load on {{ $labels.instance }}"
+          description: "1-minute load average has exceeded 1.5x CPU core count for more than 5 minutes."
+
+      - alert: HostLowDiskSpace
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker/.+"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker/.+"}) < 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }} {{ $labels.mountpoint }}"
+          description: "Filesystem {{ $labels.mountpoint }} has less than 10% free space for more than 10 minutes."
+
+      - alert: HostHighMemoryUsage
+        expr: 1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage has exceeded 90% for more than 10 minutes."
+
+  - name: mihomo-recording
+    rules:
+      - record: mihomo_proxy_probe_failure_ratio_5m
+        expr: 1 - avg_over_time(mihomo_proxy_available[5m])
+
+      - record: mihomo_proxy_latency_jitter_ms_5m
+        expr: stddev_over_time(clamp_min(mihomo_proxy_latency_ms, 0)[5m:])
+
+      - record: mihomo_selected_proxy_latency_ms
+        expr: mihomo_proxy_latency_ms * on(proxy_name) group_left(group, proxy, type) label_replace(mihomo_proxy_group_selected, "proxy_name", "$1", "proxy", "(.*)")
+
+      - record: mihomo_selected_proxy_available
+        expr: mihomo_proxy_available * on(proxy_name) group_left(group, proxy, type) label_replace(mihomo_proxy_group_selected, "proxy_name", "$1", "proxy", "(.*)")
+
+  - name: mihomo-health
+    rules:
+      - alert: MihomoExporterDown
+        expr: up{job="mihomo-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Mihomo exporter is down"
+          description: "Prometheus cannot scrape lab-mihomo-exporter for more than 2 minutes."
+
+      - alert: MihomoSelectedProxyUnavailable
+        expr: mihomo_selected_proxy_available == 0
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Selected Mihomo proxy is unavailable"
+          description: "Proxy group {{ $labels.group }} selected {{ $labels.proxy_name }}, but probe availability is 0."
+
+      - alert: MihomoSelectedProxyHighLatency
+        expr: mihomo_selected_proxy_latency_ms > 1500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Selected Mihomo proxy has high latency"
+          description: "Proxy group {{ $labels.group }} selected {{ $labels.proxy_name }} with latency {{ $value }} ms for more than 5 minutes."
+
+      - alert: MihomoProxyHighProbeFailureRatio
+        expr: mihomo_proxy_probe_failure_ratio_5m > 0.3
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Mihomo proxy has high probe failure ratio"
+          description: "Proxy {{ $labels.proxy_name }} has probe failure ratio {{ $value }} over 5 minutes."

@@ -5,13 +5,17 @@ services:
     restart: unless-stopped
     environment:
       GF_SERVER_DOMAIN: grafana.lab.skywt
-      GF_SERVER_ROOT_URL: http://grafana.lab.skywt/
+      GF_SERVER_ROOT_URL: https://grafana.lab.skywt/
     networks:
       - lab-proxy
     volumes:
       - /data/homelab/lab/grafana/data:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
     labels:
-      caddy: http://grafana.lab.skywt
+      caddy: grafana.lab.skywt
+      caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
 
 networks:

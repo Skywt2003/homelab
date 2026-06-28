@@ -4,6 +4,13 @@ This stack runs Grafana for `grafana.lab.skywt`.
 
 The Web UI is exposed through the shared Caddy reverse proxy by labels in `compose.yml`.
 
+
+Provisioned datasources are maintained under `provisioning/datasources/`. The
+`System Monitoring` Prometheus datasource points to the separate
+`hosts/lab/system-monitoring` stack over the shared Docker network.
+Provisioned dashboards are maintained under `dashboards/` and loaded by
+`provisioning/dashboards/`. The initial dashboard is `Lab Host Overview`.
+
 Runtime state is stored outside this Git repository:
 
 - `/data/homelab/lab/grafana/data`

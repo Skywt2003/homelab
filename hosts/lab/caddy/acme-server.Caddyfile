@@ -1,0 +1,17 @@
+# Base Caddyfile extended by caddy-docker-proxy.
+# Exposes lab Caddy's built-in ACME server for internal *.skywt names.
+
+acme.lab.skywt {
+	tls internal
+
+	acme_server {
+		ca local
+		challenges http-01 tls-alpn-01
+		allow {
+			domains *.lab.skywt *.dev.skywt
+			ip_ranges 100.64.0.0/10 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+		}
+	}
+
+	respond /health "ok"
+}

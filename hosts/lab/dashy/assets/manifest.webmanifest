@@ -1,0 +1,37 @@
+{
+  "name": "HomeLab",
+  "short_name": "HomeLab",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "en",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/web-icons/favicon-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-icons/dashy-pwa_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-icons/dashy-pwa_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
