@@ -90,3 +90,33 @@ groups:
         annotations:
           summary: "Mihomo proxy has high probe failure ratio"
           description: "Proxy {{ $labels.proxy_name }} has probe failure ratio {{ $value }} over 5 minutes."
+
+  - name: website-uptime
+    rules:
+      - alert: WebsiteDown
+        expr: probe_success{job="website-uptime"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Website is down: {{ $labels.instance }}"
+          description: "{{ $labels.instance }} has failed blackbox probing for more than 2 minutes."
+
+      - alert: WebsiteSlow
+        expr: probe_duration_seconds{job="website-uptime"} > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Website is slow: {{ $labels.instance }}"
+          description: "{{ $labels.instance }} response time is above 3 seconds for more than 5 minutes."
+
+      - alert: WebsiteCertificateExpiringSoon
+        expr: (probe_ssl_earliest_cert_expiry{job="website-uptime"} - time()) / 86400 < 14
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate expiring soon: {{ $labels.instance }}"
+          description: "{{ $labels.instance }} certificate expires in less than 14 days."
+

@@ -1,3 +1,6 @@
 .DS_Store
 services/system-monitoring/.env
 services/system-monitoring/.env.local
+services/nexus-admin/.env
+services/nexus-admin/.env.local
+services/rsshub/.env

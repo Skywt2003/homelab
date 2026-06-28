@@ -91,6 +91,18 @@ services:
       - system-monitoring
     logging: *default-logging
 
+  blackbox-exporter:
+    image: quay.io/prometheus/blackbox-exporter:latest
+    container_name: lab-blackbox-exporter
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/blackbox_exporter/config.yml
+    networks:
+      - system-monitoring
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    logging: *default-logging
+
   alertmanager:
     image: quay.io/prometheus/alertmanager:latest
     container_name: lab-alertmanager

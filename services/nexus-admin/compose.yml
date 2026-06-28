@@ -1,0 +1,21 @@
+services:
+  nexus-admin:
+    image: docker.lab.skywt/nexus-admin:2606281529
+    container_name: lab-nexus-admin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_EXTRA_CA_CERTS: /etc/ssl/certs/ca-certificates.crt
+    volumes:
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+    networks:
+      - lab-proxy
+    labels:
+      caddy: blog-admin.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  lab-proxy:
+    external: true

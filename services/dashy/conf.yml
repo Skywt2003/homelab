@@ -58,6 +58,11 @@ sections:
         icon: hl-rsshub
         url: https://rsshub.lab.skywt
         statusCheck: true
+      - title: Nexus Admin
+        description: Blog administration UI
+        icon: fas fa-user-cog
+        url: https://blog-admin.lab.skywt
+        statusCheck: true
       - title: Docker Registry
         description: Private image push and pull registry
         icon: fab fa-docker

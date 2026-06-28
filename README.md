@@ -14,6 +14,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
 - `docs`: operating procedures and audit notes.
