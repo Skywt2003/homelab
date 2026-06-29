@@ -1,0 +1,35 @@
+services:
+  new-api:
+    image: calciumion/new-api:latest
+    container_name: lab-new-api
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      # Route outbound provider/API traffic through the lab proxy host.
+      HTTP_PROXY: http://proxy:10810
+      HTTPS_PROXY: http://proxy:10810
+      ALL_PROXY: http://proxy:10810
+      http_proxy: http://proxy:10810
+      https_proxy: http://proxy:10810
+      all_proxy: http://proxy:10810
+      NO_PROXY: localhost,127.0.0.1,::1,lab-new-api,new-api,lab-caddy,.lab.skywt,lab-proxy
+      no_proxy: localhost,127.0.0.1,::1,lab-new-api,new-api,lab-caddy,.lab.skywt,lab-proxy
+      # New API / One API compatible relay proxy settings for model requests and user-upload fetches.
+      RELAY_PROXY: http://proxy:10810
+      USER_CONTENT_REQUEST_PROXY: http://proxy:10810
+    extra_hosts:
+      # Keep the short hostname usable from inside Docker even if container DNS
+      # does not inherit the host's Tailscale/local resolver search behavior.
+      - "proxy:100.64.0.7"
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/new-api/data:/data
+    labels:
+      caddy: ai-api.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  lab-proxy:
+    external: true

@@ -58,6 +58,11 @@ sections:
         icon: hl-rsshub
         url: https://rsshub.lab.skywt
         statusCheck: true
+      - title: New API
+        description: Local LLM API gateway and provider management
+        icon: fas fa-brain
+        url: https://ai-api.lab.skywt
+        statusCheck: true
       - title: Nexus Admin
         description: Blog administration UI
         icon: fas fa-user-cog

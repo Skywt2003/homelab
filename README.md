@@ -14,6 +14,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
@@ -38,6 +39,7 @@ Current paths:
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
+- `/data/homelab/lab/new-api/data`
 - `/data/homelab/lab/rsshub/redis`
 - `/data/homelab/lab/system-monitoring/prometheus`
 - `/data/homelab/lab/system-monitoring/alertmanager`
@@ -60,6 +62,7 @@ sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
 sudo mkdir -p /data/homelab/lab/grafana/data
 sudo chown -R 472:472 /data/homelab/lab/grafana/data
+sudo mkdir -p /data/homelab/lab/new-api/data
 sudo mkdir -p /data/homelab/lab/rsshub/redis
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
