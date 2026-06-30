@@ -1,0 +1,25 @@
+services:
+  apprise-api:
+    image: caronc/apprise:latest
+    container_name: lab-apprise-api
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      APPRISE_STATEFUL_MODE: simple
+      APPRISE_WORKER_COUNT: "1"
+      APPRISE_ADMIN: "y"
+      TZ: Etc/UTC
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/apprise-api/config:/config
+      - /data/homelab/lab/apprise-api/attach:/attach
+      - /data/homelab/lab/apprise-api/plugin:/plugin
+    labels:
+      caddy: notify.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8000}}"
+
+networks:
+  lab-proxy:
+    external: true

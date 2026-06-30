@@ -6,6 +6,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 
 ## Layout
 
+- `services/apprise-api`: Apprise API notification gateway for `notify.lab.skywt`.
 - `services/archivebox`: ArchiveBox for `archive.lab.skywt`.
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
@@ -33,6 +34,9 @@ Current paths:
 
 - `/data/homelab/lab/adguard/conf`
 - `/data/homelab/lab/adguard/work`
+- `/data/homelab/lab/apprise-api/config`
+- `/data/homelab/lab/apprise-api/attach`
+- `/data/homelab/lab/apprise-api/plugin`
 - `/data/homelab/lab/archivebox/data`
 - `/data/homelab/lab/caddy/data`
 - `/data/homelab/lab/caddy/config`
@@ -56,6 +60,8 @@ sudo docker compose -f compose.yml up -d
 Services with first-run data directories may need preparation:
 
 ```bash
+sudo mkdir -p /data/homelab/lab/apprise-api/{config,attach,plugin}
+sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 sudo mkdir -p /data/homelab/lab/archivebox/data
 sudo mkdir -p /data/homelab/lab/docker-registry/data
 sudo mkdir -p /data/homelab/lab/gitea/data

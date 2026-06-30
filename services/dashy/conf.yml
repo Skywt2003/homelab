@@ -48,6 +48,11 @@ sections:
         icon: hl-archivebox
         url: https://archive.lab.skywt
         statusCheck: true
+      - title: Apprise API
+        description: Multi-channel notification gateway
+        icon: fas fa-bell
+        url: https://notify.lab.skywt
+        statusCheck: true
       - title: Gitea
         description: Self-hosted Git repositories
         icon: hl-gitea
