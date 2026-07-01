@@ -10,6 +10,12 @@ Runtime state is stored outside this Git repository:
 
 - `/data/homelab/lab/gitea/data`
 
+## Secrets
+
+This stack currently has no Compose-mounted secrets.
+
+Gitea application secrets, users, SSH keys, tokens, and repository data live under `/data/homelab/lab/gitea/data` and must not be copied into Git. Future bootstrap secrets should be stored in Infisical and mounted according to `docs/secret-management-sop.md`.
+
 ## Deploy
 
 ```bash

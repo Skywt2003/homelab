@@ -26,3 +26,9 @@ The maintained AdGuard template includes these local wildcard rewrites:
 
 - `*.lab.skywt` -> `100.64.0.2` for services on this `lab` host.
 - `*.dev.skywt` -> `100.64.0.5` for development projects on the separate `dev` host. The projects themselves are not managed by this repository.
+
+## Secrets
+
+AdGuard Home's admin password hash is a secret-bearing authentication artifact even though it is not a plain password.
+
+The Git-maintained template must not contain a real admin password hash. When bootstrapping or rotating AdGuard credentials, generate the hash with the AdGuard-supported procedure, store the final hash in Infisical as an externally-generated secret, and materialize it only into the runtime config under `/data/homelab/lab/adguard/conf`.

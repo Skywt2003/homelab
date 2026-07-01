@@ -15,6 +15,12 @@ Runtime state is stored outside this Git repository:
 
 - `/data/homelab/lab/grafana/data`
 
+## Secrets
+
+This stack currently has no Compose-mounted secrets.
+
+Grafana users, sessions, API keys, and datasource credentials live in Grafana runtime data unless explicitly provisioned. Do not commit datasource credentials in provisioning files. Future provisioned credentials must come from Infisical and be mounted according to `docs/secret-management-sop.md`.
+
 ## Deploy
 
 ```bash

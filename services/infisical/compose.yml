@@ -1,0 +1,56 @@
+services:
+  infisical:
+    image: infisical/infisical:latest
+    container_name: lab-infisical
+    restart: unless-stopped
+    depends_on:
+      infisical-db:
+        condition: service_healthy
+      infisical-redis:
+        condition: service_started
+    env_file:
+      - /data/homelab/lab/infisical/env/infisical.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8080
+      SITE_URL: https://secrets.lab.skywt
+      TRUSTED_PROXY_CIDRS: 172.16.0.0/12,127.0.0.0/8
+    networks:
+      - lab-proxy
+      - infisical-internal
+    labels:
+      caddy: secrets.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  infisical-db:
+    image: postgres:14-alpine
+    container_name: lab-infisical-db
+    restart: unless-stopped
+    env_file:
+      - /data/homelab/lab/infisical/env/infisical.env
+    volumes:
+      - /data/homelab/lab/infisical/postgres:/var/lib/postgresql/data
+    networks:
+      - infisical-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=$${POSTGRES_USER} --dbname=$${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  infisical-redis:
+    image: redis:7-alpine
+    container_name: lab-infisical-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - /data/homelab/lab/infisical/redis:/data
+    networks:
+      - infisical-internal
+
+networks:
+  lab-proxy:
+    external: true
+  infisical-internal:

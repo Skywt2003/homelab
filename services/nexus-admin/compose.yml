@@ -4,9 +4,39 @@ services:
     container_name: lab-nexus-admin
     restart: unless-stopped
     env_file:
-      - .env
+      - /data/homelab/lab/nexus-admin/env/public.env
+    command:
+      - node
+      - -e
+      - |
+        const fs = require('fs');
+        const cp = require('child_process');
+        const read = (path) => fs.readFileSync(path, 'utf8').replace(/[\r\n]+$/, '');
+        process.env.ADMIN_PASSWORD = read('/run/secrets/admin_password');
+        process.env.RESEND_API_KEY = read('/run/secrets/resend_api_key');
+        process.env.S3_ACCESS_KEY_ID = read('/run/secrets/s3_access_key_id');
+        process.env.S3_SECRET_ACCESS_KEY = read('/run/secrets/s3_secret_access_key');
+        process.env.SUPABASE_SECRET_KEY = read('/run/secrets/supabase_secret_key');
+        const child = cp.spawn(process.execPath, ['server.js'], { stdio: 'inherit', env: process.env });
+        child.on('exit', (code, signal) => signal ? process.kill(process.pid, signal) : process.exit(code ?? 0));
     environment:
       NODE_EXTRA_CA_CERTS: /etc/ssl/certs/ca-certificates.crt
+    secrets:
+      - source: nexus_admin_admin_password
+        target: admin_password
+        mode: 0400
+      - source: nexus_admin_resend_api_key
+        target: resend_api_key
+        mode: 0400
+      - source: nexus_admin_s3_access_key_id
+        target: s3_access_key_id
+        mode: 0400
+      - source: nexus_admin_s3_secret_access_key
+        target: s3_secret_access_key
+        mode: 0400
+      - source: nexus_admin_supabase_secret_key
+        target: supabase_secret_key
+        mode: 0400
     volumes:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
     networks:
@@ -15,6 +45,18 @@ services:
       caddy: blog-admin.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+
+secrets:
+  nexus_admin_admin_password:
+    file: /run/homelab/secrets/nexus-admin/admin_password
+  nexus_admin_resend_api_key:
+    file: /run/homelab/secrets/nexus-admin/resend_api_key
+  nexus_admin_s3_access_key_id:
+    file: /run/homelab/secrets/nexus-admin/s3_access_key_id
+  nexus_admin_s3_secret_access_key:
+    file: /run/homelab/secrets/nexus-admin/s3_secret_access_key
+  nexus_admin_supabase_secret_key:
+    file: /run/homelab/secrets/nexus-admin/supabase_secret_key
 
 networks:
   lab-proxy:

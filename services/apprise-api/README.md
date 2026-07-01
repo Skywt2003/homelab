@@ -25,6 +25,17 @@ sudo mkdir -p /data/homelab/lab/apprise-api/{config,attach,plugin}
 sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 ```
 
+## Secrets
+
+Apprise notification URLs and provider tokens are secrets when they grant access to external notification channels.
+
+Current stack configuration does not mount Compose secrets. Runtime Apprise configuration is stored under `/data/homelab/lab/apprise-api/config` and must not be copied into Git.
+
+When adding notification credentials through Compose or bootstrap files, follow `docs/secret-management-sop.md`:
+
+- Internal random webhook tokens are Infisical-generated secrets.
+- Provider-issued tokens, bot tokens, SMTP passwords, or webhook URLs are externally-generated secrets and must be stored in Infisical after being issued by the provider.
+
 ## Deploy
 
 ```bash

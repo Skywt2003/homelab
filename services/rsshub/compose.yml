@@ -4,12 +4,22 @@ services:
     container_name: lab-rsshub
     restart: unless-stopped
     env_file:
-      - .env
+      - /data/homelab/lab/rsshub/env/public.env
+    command:
+      - sh
+      - -ec
+      - |
+        export TWITTER_AUTH_TOKEN="`cat /run/secrets/twitter_auth_token`"
+        exec npm run start
     environment:
       NODE_ENV: production
       CACHE_TYPE: redis
       REDIS_URL: redis://redis:6379/
       PLAYWRIGHT_WS_ENDPOINT: ws://browserless:3000/chromium/playwright
+    secrets:
+      - source: rsshub_twitter_auth_token
+        target: twitter_auth_token
+        mode: 0400
     depends_on:
       redis:
         condition: service_healthy
@@ -59,6 +69,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
+
+secrets:
+  rsshub_twitter_auth_token:
+    file: /run/homelab/secrets/rsshub/twitter_auth_token
 
 networks:
   lab-proxy:

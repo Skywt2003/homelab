@@ -2,6 +2,8 @@
 
 Audit date: 2026-06-28 UTC
 
+Historical note: this audit predates the Infisical deployment and is kept as a point-in-time status record, not as the current service inventory or secret-management policy.
+
 Command used:
 
 ```bash

@@ -15,6 +15,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
@@ -24,7 +25,29 @@ This repository intentionally no longer manages `dev` host projects. Development
 ## SOPs
 
 - [New Service SOP](docs/new-service-sop.md)
+- [Secret Management SOP](docs/secret-management-sop.md)
 - [Service Status Audit](docs/service-status-audit.md)
+- [Secret Governance Audit - 2026-06-30](docs/secret-governance-audit-2026-06-30.md)
+
+## Secret Management
+
+Real secrets must not be committed to this repository. Infisical at `https://secrets.lab.skywt` is the authoritative inventory for lab service secrets. New services must follow [Secret Management SOP](docs/secret-management-sop.md).
+
+Standard flow for service secrets:
+
+1. Classify each secret as either Infisical-generated or externally-generated.
+2. Store the final value in Infisical under project `homelab`, environment `prod`, path `/<service>`.
+3. Materialize deploy-time files under `/run/homelab/secrets/<service>/` on the `lab` host.
+4. Mount those files into containers through Docker Compose `secrets` and prefer `/run/secrets/<name>` plus `_FILE` variables.
+
+Secret origin classes:
+
+- **Infisical-generated**: opaque random values such as database passwords, session/JWT/cookie secrets, registry HTTP secrets, or internal webhook tokens. Generate these directly in Infisical.
+- **Externally-generated**: values that must come from another system or tool, such as third-party API keys, OAuth client secrets, TLS/SSH/WireGuard private keys, `htpasswd`/bcrypt hashes, provider-issued tokens, and service-generated first-run credentials. Generate or obtain them externally, then store the final value in Infisical.
+
+Exception: Infisical's own bootstrap secrets live outside Git in `/data/homelab/lab/infisical/env/infisical.env` because Infisical cannot depend on itself to start. Back up that file securely together with Infisical PostgreSQL data.
+
+Service secrets are materialized with `scripts/materialize-secrets.sh`. Do not copy legacy repo-local `.env` patterns into new services.
 
 ## Runtime Data
 
@@ -43,7 +66,12 @@ Current paths:
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
+- `/data/homelab/lab/infisical/env`
+- `/data/homelab/lab/infisical/postgres`
+- `/data/homelab/lab/infisical/redis`
 - `/data/homelab/lab/new-api/data`
+- `/data/homelab/lab/nexus-admin/env`
+- `/data/homelab/lab/rsshub/env`
 - `/data/homelab/lab/rsshub/redis`
 - `/data/homelab/lab/system-monitoring/prometheus`
 - `/data/homelab/lab/system-monitoring/alertmanager`
@@ -68,8 +96,10 @@ sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
 sudo mkdir -p /data/homelab/lab/grafana/data
 sudo chown -R 472:472 /data/homelab/lab/grafana/data
+sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
 sudo mkdir -p /data/homelab/lab/new-api/data
-sudo mkdir -p /data/homelab/lab/rsshub/redis
+sudo mkdir -p /data/homelab/lab/nexus-admin/env
+sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
 ```
@@ -82,4 +112,11 @@ sudo docker compose -f compose.yml run --rm archivebox init
 sudo docker compose -f compose.yml up -d
 ```
 
-System monitoring reads the Mihomo exporter token from `services/system-monitoring/.env`; create it from `.env.example` before deploying that stack.
+Before deploying services that use secrets, materialize current values from Infisical on the lab host:
+
+```bash
+# Requires /data/homelab/lab/infisical/client.env with INFISICAL_PROJECT_ID and either INFISICAL_CLIENT_ID/INFISICAL_CLIENT_SECRET or INFISICAL_TOKEN.
+sudo ./scripts/materialize-secrets.sh all
+```
+
+`sudo ./scripts/import-legacy-secrets.sh` was used for the one-time migration from root-only legacy files into Infisical. Do not recreate legacy secret files for normal operation.

@@ -33,11 +33,25 @@ After deployment, import or build dashboards in Grafana at `https://grafana.lab.
 Good starter dashboards are Node Exporter and Docker/cAdvisor dashboards from the
 Grafana dashboard catalog.
 
+## Secrets
+
+The Mihomo API token is generated and owned by the Mihomo instance on the `proxy` host, so it is an externally-generated secret.
+
+`MIHOMO_API_TOKEN` is managed in Infisical path `/system-monitoring` and materialized to:
+
+- `/run/homelab/secrets/system-monitoring/mihomo_api_token`
+
+Compose mounts the token as a Docker secret and uses a shell wrapper in the existing `homelab/mihomo-prometheus-exporter:local` image to export `MIHOMO_API_TOKEN` immediately before `exec /mihomo-exporter`, so the token value is not present in the Compose file or rendered Docker config.
+
+Do not add monitoring tokens, Alertmanager receiver credentials, webhook URLs, SMTP passwords, or chat bot tokens to Git-maintained files.
+
 ## Deploy
 
 ```bash
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
+cd ~/homelab
+sudo ./scripts/materialize-secrets.sh system-monitoring
 cd ~/homelab/services/system-monitoring
 sudo docker compose -f compose.yml up -d
 ```
@@ -78,4 +92,4 @@ Components:
 
 The exporter runs on `lab` and reads Mihomo's External Controller on the `proxy` Tailscale address `http://100.64.0.7:9090`. The controller is protected by Mihomo's `secret`, and metrics are stored in Prometheus on `lab`.
 
-Runtime secret configuration is kept out of Git in `services/system-monitoring/.env`. Use `services/system-monitoring/.env.example` as the template.
+`MIHOMO_API_TOKEN` is no longer read from a repo-local `.env`; after import/materialization it is loaded from the Docker secret file described above. The temporary legacy import file has been removed after verification.

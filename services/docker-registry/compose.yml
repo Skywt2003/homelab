@@ -3,10 +3,20 @@ services:
     image: registry:2
     container_name: lab-docker-registry
     restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - |
+        export REGISTRY_HTTP_SECRET="`cat /run/secrets/http_secret`"
+        exec /entrypoint.sh /etc/docker/registry/config.yml
     environment:
       REGISTRY_HTTP_ADDR: 0.0.0.0:5000
-      REGISTRY_HTTP_SECRET: REDACTED
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+    secrets:
+      - source: docker_registry_http_secret
+        target: http_secret
+        mode: 0400
     networks:
       - lab-proxy
     volumes:
@@ -20,6 +30,10 @@ services:
       caddy: docker.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 5000}}"
+
+secrets:
+  docker_registry_http_secret:
+    file: /run/homelab/secrets/docker-registry/http_secret
 
 networks:
   lab-proxy:

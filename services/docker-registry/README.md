@@ -8,10 +8,20 @@ Runtime image storage is stored outside this Git repository:
 
 - `/data/homelab/lab/docker-registry/data`
 
+## Secrets
+
+`REGISTRY_HTTP_SECRET` is managed in Infisical path `/docker-registry` and materialized to:
+
+- `/run/homelab/secrets/docker-registry/http_secret`
+
+The Compose file mounts that file as a Docker secret at `/run/secrets/http_secret`. Because the upstream `registry:2` image expects `REGISTRY_HTTP_SECRET` as an environment variable, Compose uses a shell wrapper to read the secret file and export the variable immediately before `exec /entrypoint.sh`.
+
 ## Deploy
 
 ```bash
 sudo mkdir -p /data/homelab/lab/docker-registry/data
+cd ~/homelab
+sudo ./scripts/materialize-secrets.sh docker-registry
 cd ~/homelab/services/docker-registry
 sudo docker compose -f compose.yml up -d
 ```

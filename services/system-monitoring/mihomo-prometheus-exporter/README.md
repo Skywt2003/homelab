@@ -44,9 +44,18 @@ Exporter，用于从 [Mihomo](https://github.com/MetaCubeX/mihomo) 中导出详�
 ./mihomo-exporter \
   --web.listen-address=":9188" \
   --mihomo.api-url="http://127.0.0.1:9090" \
-  --mihomo.api-token="YOUR_SECRET_TOKEN" \
+  --mihomo.api-token="<MIHOMO_API_TOKEN>" \
   --scrape.interval="1s"
 ```
+
+## Homelab Secret Handling
+
+在本 homelab 仓库中，`MIHOMO_API_TOKEN` 不能以真实值写入 README、Compose 文件或示例命令。
+
+- Mihomo `secret` 由 `proxy` 主机上的 Mihomo 配置生成和持有，因此属于 externally-generated secret。
+- 最终 token 存入 Infisical 的 `/system-monitoring` 路径，并由部署流程 materialize 到 Docker secret 文件。
+- homelab Compose 不改 exporter 镜像；它通过 Docker secret 文件和 shell wrapper 在进程启动前注入 `MIHOMO_API_TOKEN`。
+- 以下示例只能使用占位符，不得替换成真实 token 后提交。
 
 ## 使用方法
 
@@ -56,7 +65,7 @@ Exporter，用于从 [Mihomo](https://github.com/MetaCubeX/mihomo) 中导出详�
 |----------------------|---------------------|-------------------------|----------------------------------------|
 | `web.listen-address` | `WEB_LISTEN_ADDRESS` | `:9188` | Exporter 监听的地址和端口。                     |
 | `mihomo.api-url` | `MIHOMO_API_URL` | `http://127.0.0.1:9097` | Mihomo `external-controller` 的 API 地址。 |
-| `mihomo.api-token` | `MIHOMO_API_TOKEN` | `""` | Mihomo API 的 `secret` (如果设置了)。         |
+| `mihomo.api-token` | `MIHOMO_API_TOKEN` | `""` | Mihomo API 的 `secret`；homelab Compose 从 Docker secret 文件注入该变量。         |
 | `scrape.interval` | `SCRAPE_INTERVAL` | `1s` | 从 Mihomo API 拉取数据的频率。                  |
 | `latency.interval` | `LATENCY_INTERVAL` | `60s` | 从 Mihomo 进行统一延迟测试的频率                   |
 | `metric.prefix` | `METRIC_PREFIX` | `mihomo` | 导出的指标前缀                                |
@@ -69,13 +78,13 @@ Exporter，用于从 [Mihomo](https://github.com/MetaCubeX/mihomo) 中导出详�
 前台运行测试
 
 ```shell
-docker run -it --rm -e MIHOMO_API_URL=http://host.docker.internal:9097 -e MIHOMO_API_TOKEN=set-your-secret  -p 9188:9188 ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
+docker run -it --rm -e MIHOMO_API_URL=http://host.docker.internal:9097 -e MIHOMO_API_TOKEN=<MIHOMO_API_TOKEN>  -p 9188:9188 ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
 ```
 
 正常启动
 
 ```shell
- docker run -d -e MIHOMO_API_URL=http://host.docker.internal:9097 -e MIHOMO_API_TOKEN=set-your-secret  -p 9188:9188  ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
+ docker run -d -e MIHOMO_API_URL=http://host.docker.internal:9097 -e MIHOMO_API_TOKEN=<MIHOMO_API_TOKEN>  -p 9188:9188  ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
 ```
 
 ### Docker Compose Service
@@ -84,14 +93,23 @@ docker run -it --rm -e MIHOMO_API_URL=http://host.docker.internal:9097 -e MIHOMO
 version: "3.3"
 services:
   mihomo-prometheus-exporter:
+    image: ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        export MIHOMO_API_TOKEN="`cat /run/secrets/mihomo_api_token`"
+        exec /mihomo-exporter
     environment:
       - MIHOMO_API_URL=http://host.docker.internal:9097 # 替换成实际的API地址
-      - MIHOMO_API_TOKEN=set-your-secret # 替换成实际的token
       - METRIC_PREFIX=mihomo
+    secrets:
+      - mihomo_api_token
     ports:
       - 9188:9188
-    image: ghcr.io/wherearebugs/mihomo-prometheus-exporter:master
-  # 按需添加其他的service...
+
+secrets:
+  mihomo_api_token:
+    file: /run/homelab/secrets/system-monitoring/mihomo_api_token
 networks: {}
 ```
 

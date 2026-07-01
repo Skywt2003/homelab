@@ -12,6 +12,12 @@ The local static service only listens inside the Docker network on port `8080`.
 Only the public root certificate is exposed. Do not publish the private key files
 from the same runtime directory.
 
+## Secrets
+
+The served `root.crt` is public and may be downloaded by clients.
+
+Caddy's internal CA private keys under `/data/homelab/lab/caddy/data` are secrets. They are externally-generated service runtime secrets and must never be published, copied into Git, or mounted into this static guide container.
+
 ## Deploy
 
 ```bash

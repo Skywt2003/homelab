@@ -77,9 +77,15 @@ services:
     image: homelab/mihomo-prometheus-exporter:local
     container_name: lab-mihomo-exporter
     restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - |
+        export MIHOMO_API_TOKEN="`cat /run/secrets/mihomo_api_token`"
+        exec /mihomo-exporter
     environment:
       MIHOMO_API_URL: http://100.64.0.7:9090
-      MIHOMO_API_TOKEN: ${MIHOMO_API_TOKEN:?set MIHOMO_API_TOKEN in services/system-monitoring/.env}
       SCRAPE_INTERVAL: 5s
       LATENCY_INTERVAL: 60s
       METRIC_PREFIX: mihomo
@@ -87,6 +93,10 @@ services:
       METRICS_ENABLE_NODE_AGGREGATION: "true"
       # Destination labels can become high-cardinality; node aggregation remains enabled.
       METRICS_ENABLE_DESTINATION_AGGREGATION: "false"
+    secrets:
+      - source: system_monitoring_mihomo_api_token
+        target: mihomo_api_token
+        mode: 0444
     networks:
       - system-monitoring
     logging: *default-logging
@@ -121,6 +131,10 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9093}}"
     logging: *default-logging
+
+secrets:
+  system_monitoring_mihomo_api_token:
+    file: /run/homelab/secrets/system-monitoring/mihomo_api_token
 
 networks:
   lab-proxy:

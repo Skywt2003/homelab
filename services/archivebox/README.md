@@ -10,6 +10,12 @@ Runtime state is stored outside this Git repository:
 
 - `/data/homelab/lab/archivebox/data`
 
+## Secrets
+
+This stack currently has no Compose-mounted secrets.
+
+ArchiveBox users, passwords, and application-generated credentials live in the runtime data directory and must not be copied into Git. If future bootstrap credentials are needed, store them in Infisical and mount them according to `docs/secret-management-sop.md`.
+
 ## Deploy
 
 ```bash

@@ -23,14 +23,13 @@ func loadFlagsFromEnv() {
 		envName := strings.ToUpper(replacer.Replace(f.Name))
 		if value, ok := os.LookupEnv(envName); ok {
 			if err := flag.Set(f.Name, value); err != nil {
-				log.Printf("Failed to set flag '%s' from environment variable '%s' with value '%s': %v", f.Name, envName, value, err)
+				log.Printf("Failed to set flag '%s' from environment variable '%s': %v", f.Name, envName, err)
 			} else {
 				log.Printf("Loaded flag '%s' from environment variable '%s'", f.Name, envName)
 			}
 		}
 	})
 }
-
 func main() {
 	// 命令行参数定义
 	listenAddress := flag.String("web.listen-address", ":9188", "Address to listen on for web interface and telemetry.")
