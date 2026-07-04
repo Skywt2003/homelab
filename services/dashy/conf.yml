@@ -58,6 +58,11 @@ sections:
         icon: hl-archivebox
         url: https://archive.lab.skywt
         statusCheck: true
+      - title: Calibre-Web
+        description: Ebook library and reader
+        icon: fas fa-book
+        url: https://books.lab.skywt
+        statusCheck: true
       - title: Apprise API
         description: Multi-channel notification gateway
         icon: fas fa-bell
