@@ -33,6 +33,11 @@ sections:
         icon: hl-grafana
         url: https://grafana.lab.skywt
         statusCheck: true
+      - title: Cronicle
+        description: Web-managed scheduled and on-demand jobs
+        icon: fas fa-clock
+        url: https://cron.lab.skywt
+        statusCheck: true
       - title: Infisical
         description: Secret management platform
         icon: fas fa-key

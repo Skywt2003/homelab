@@ -10,6 +10,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/archivebox`: ArchiveBox for `archive.lab.skywt`.
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
+- `services/cronicle`: Cronicle web-managed task scheduler for `cron.lab.skywt`.
 - `services/dashy`: Dashy service index for `index.lab.skywt`.
 - `services/dns`: AdGuard Home DNS stack for `dns.lab.skywt`.
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
@@ -63,6 +64,9 @@ Current paths:
 - `/data/homelab/lab/archivebox/data`
 - `/data/homelab/lab/caddy/data`
 - `/data/homelab/lab/caddy/config`
+- `/data/homelab/lab/cronicle/data`
+- `/data/homelab/lab/cronicle/logs`
+- `/data/homelab/lab/cronicle/queue`
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
@@ -91,6 +95,7 @@ Services with first-run data directories may need preparation:
 sudo mkdir -p /data/homelab/lab/apprise-api/{config,attach,plugin}
 sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 sudo mkdir -p /data/homelab/lab/archivebox/data
+sudo mkdir -p /data/homelab/lab/cronicle/{data,logs,queue}
 sudo mkdir -p /data/homelab/lab/docker-registry/data
 sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data

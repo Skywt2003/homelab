@@ -78,6 +78,10 @@ write_secret() {
   rm -f "$tmp"
 }
 
+materialize_cronicle() {
+  write_secret cronicle /cronicle SECRET_KEY secret_key
+}
+
 materialize_docker_registry() {
   write_secret docker-registry /docker-registry REGISTRY_HTTP_SECRET http_secret
 }
@@ -100,11 +104,13 @@ materialize_system_monitoring() {
 }
 
 case "$action" in
+  cronicle) materialize_cronicle ;;
   docker-registry) materialize_docker_registry ;;
   nexus-admin) materialize_nexus_admin ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
   all)
+    materialize_cronicle
     materialize_docker_registry
     materialize_nexus_admin
     materialize_rsshub

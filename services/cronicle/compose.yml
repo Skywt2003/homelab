@@ -1,0 +1,40 @@
+services:
+  cronicle:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        CRONICLE_VERSION: v0.9.122
+    image: homelab/cronicle:v0.9.122
+    container_name: lab-cronicle
+    hostname: lab-cronicle
+    restart: unless-stopped
+    environment:
+      TZ: Etc/UTC
+      CRONICLE_BASE_APP_URL: https://cron.lab.skywt
+      CRONICLE_EMAIL_FROM: cronicle@lab.skywt
+      CRONICLE_SMTP_HOSTNAME: localhost
+      CRONICLE_SMTP_PORT: "25"
+    secrets:
+      - source: cronicle_secret_key
+        target: secret_key
+        mode: 0400
+    networks:
+      - lab-proxy
+    volumes:
+      - ./config/config.template.json:/etc/cronicle/config.template.json:ro
+      - /data/homelab/lab/cronicle/data:/opt/cronicle/data
+      - /data/homelab/lab/cronicle/logs:/opt/cronicle/logs
+      - /data/homelab/lab/cronicle/queue:/opt/cronicle/queue
+    labels:
+      caddy: cron.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3012}}"
+
+secrets:
+  cronicle_secret_key:
+    file: /run/homelab/secrets/cronicle/secret_key
+
+networks:
+  lab-proxy:
+    external: true
