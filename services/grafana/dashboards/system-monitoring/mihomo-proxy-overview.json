@@ -8,7 +8,7 @@
   ],
   "timezone": "browser",
   "schemaVersion": 41,
-  "version": 1,
+  "version": 5,
   "refresh": "10s",
   "time": {
     "from": "now-6h",
@@ -502,22 +502,23 @@
     {
       "id": 9,
       "type": "table",
-      "title": "Current proxy group selection",
+      "title": "Current selected proxy nodes",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
         "x": 0,
-        "y": 12,
-        "w": 12,
-        "h": 8
+        "y": 20,
+        "w": 24,
+        "h": 5
       },
       "targets": [
         {
           "expr": "mihomo_proxy_group_selected",
-          "legendFormat": "",
-          "refId": "A"
+          "legendFormat": "{{group}} → {{proxy}}",
+          "refId": "A",
+          "instant": true
         }
       ],
       "fieldConfig": {
@@ -569,26 +570,27 @@
             }
           }
         }
-      ]
+      ],
+      "description": "Current Mihomo proxy-group selections reported by mihomo_proxy_group_selected from the proxy host."
     },
     {
       "id": 10,
       "type": "state-timeline",
-      "title": "Proxy group selection timeline",
+      "title": "Selected proxy node timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
-        "x": 12,
-        "y": 12,
-        "w": 12,
-        "h": 8
+        "x": 0,
+        "y": 25,
+        "w": 24,
+        "h": 16
       },
       "targets": [
         {
           "expr": "mihomo_proxy_group_selected",
-          "legendFormat": "",
+          "legendFormat": "{{group}} · {{proxy}}",
           "refId": "A"
         }
       ],
@@ -612,39 +614,49 @@
                 "value": 90
               }
             ]
+          },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 85
           }
         },
         "overrides": []
       },
       "options": {
         "mergeValues": true,
-        "showValue": "always",
+        "showValue": "never",
         "alignValue": "center",
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
+        },
+        "rowHeight": 0.9,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
         }
-      }
+      },
+      "description": "Full-width, taller timeline of the proxy node selected by each Mihomo proxy group. Labels are shortened and bar values are hidden to improve readability."
     },
     {
       "id": 11,
       "type": "timeseries",
-      "title": "Proxy latency",
+      "title": "Selected proxy latency history",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
         "x": 0,
-        "y": 20,
-        "w": 12,
+        "y": 12,
+        "w": 8,
         "h": 8
       },
       "targets": [
         {
-          "expr": "mihomo_proxy_latency_ms",
-          "legendFormat": "",
+          "expr": "mihomo_selected_proxy_latency_ms",
+          "legendFormat": "{{group}} → {{proxy}}",
           "refId": "A"
         }
       ],
@@ -661,11 +673,11 @@
               },
               {
                 "color": "yellow",
-                "value": 70
+                "value": 300
               },
               {
                 "color": "red",
-                "value": 90
+                "value": 1000
               }
             ]
           }
@@ -682,26 +694,27 @@
           "mode": "multi",
           "sort": "none"
         }
-      }
+      },
+      "description": "Latency history only for nodes that are currently selected by Mihomo proxy groups."
     },
     {
       "id": 12,
       "type": "timeseries",
-      "title": "Probe failure ratio (5m)",
+      "title": "Selected proxy error rate (5m)",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
-        "x": 12,
-        "y": 20,
-        "w": 6,
+        "x": 8,
+        "y": 12,
+        "w": 8,
         "h": 8
       },
       "targets": [
         {
-          "expr": "mihomo_proxy_probe_failure_ratio_5m",
-          "legendFormat": "",
+          "expr": "(1 - avg_over_time(mihomo_selected_proxy_available[5m])) and on(group, proxy, type) mihomo_proxy_group_selected",
+          "legendFormat": "{{group}} → {{proxy}}",
           "refId": "A"
         }
       ],
@@ -718,11 +731,11 @@
               },
               {
                 "color": "yellow",
-                "value": 70
+                "value": 0.05
               },
               {
                 "color": "red",
-                "value": 90
+                "value": 0.2
               }
             ]
           }
@@ -739,26 +752,27 @@
           "mode": "multi",
           "sort": "none"
         }
-      }
+      },
+      "description": "Rolling 5 minute probe failure ratio, gated by the proxy group selection at each evaluation time so stale post-switch series are hidden."
     },
     {
       "id": 13,
       "type": "timeseries",
-      "title": "Latency jitter (5m)",
+      "title": "Selected proxy latency jitter (5m)",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
-        "x": 18,
-        "y": 20,
-        "w": 6,
+        "x": 16,
+        "y": 12,
+        "w": 8,
         "h": 8
       },
       "targets": [
         {
-          "expr": "mihomo_proxy_latency_jitter_ms_5m",
-          "legendFormat": "",
+          "expr": "stddev_over_time(clamp_min(mihomo_selected_proxy_latency_ms, 0)[5m:]) and on(group, proxy, type) mihomo_proxy_group_selected",
+          "legendFormat": "{{group}} → {{proxy}}",
           "refId": "A"
         }
       ],
@@ -775,11 +789,11 @@
               },
               {
                 "color": "yellow",
-                "value": 70
+                "value": 100
               },
               {
                 "color": "red",
-                "value": 90
+                "value": 300
               }
             ]
           }
@@ -796,19 +810,20 @@
           "mode": "multi",
           "sort": "none"
         }
-      }
+      },
+      "description": "Rolling 5 minute standard deviation of latency, gated by the proxy group selection at each evaluation time so stale post-switch series are hidden."
     },
     {
       "id": 14,
       "type": "table",
-      "title": "Proxy availability and latency",
+      "title": "All proxy availability and latency",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
       },
       "gridPos": {
         "x": 0,
-        "y": 28,
+        "y": 41,
         "w": 24,
         "h": 8
       },
@@ -859,7 +874,8 @@
             "mode": "columns"
           }
         }
-      ]
+      ],
+      "description": "Current availability and latency for all probed Mihomo proxy nodes."
     }
   ]
 }
