@@ -11,7 +11,6 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/calibre-web`: Calibre-Web ebook library for `books.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
-- `services/cronicle`: Cronicle web-managed task scheduler for `cron.lab.skywt`.
 - `services/dns`: AdGuard Home DNS stack for `dns.lab.skywt`.
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
@@ -67,9 +66,6 @@ Current paths:
 - `/data/homelab/lab/caddy/config`
 - `/data/homelab/lab/calibre-web/config`
 - `/data/homelab/lab/calibre-web/books`
-- `/data/homelab/lab/cronicle/data`
-- `/data/homelab/lab/cronicle/logs`
-- `/data/homelab/lab/cronicle/queue`
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
@@ -100,7 +96,6 @@ sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 sudo mkdir -p /data/homelab/lab/archivebox/data
 sudo mkdir -p /data/homelab/lab/calibre-web/{config,books}
 sudo chown -R 1000:1000 /data/homelab/lab/calibre-web
-sudo mkdir -p /data/homelab/lab/cronicle/{data,logs,queue}
 sudo mkdir -p /data/homelab/lab/docker-registry/data
 sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
