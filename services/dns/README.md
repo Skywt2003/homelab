@@ -26,6 +26,7 @@ The maintained AdGuard template includes these local wildcard rewrites:
 
 - `*.lab.skywt` -> `100.64.0.2` for services on this `lab` host.
 - `*.dev.skywt` -> `100.64.0.5` for development projects on the separate `dev` host. The projects themselves are not managed by this repository.
+- `nas.skywt` -> `100.64.0.12` for the OMV NAS host.
 
 ## Secrets
 

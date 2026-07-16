@@ -50,6 +50,7 @@ Do not add monitoring tokens, Alertmanager receiver credentials, webhook URLs, S
 ```bash
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
+sudo chown -R 65534:65534 /data/homelab/lab/system-monitoring/alertmanager
 cd ~/homelab
 sudo ./scripts/materialize-secrets.sh system-monitoring
 cd ~/homelab/services/system-monitoring
@@ -74,9 +75,14 @@ sudo docker exec lab-prometheus wget -qO- --post-data='' http://localhost:9090/-
 
 ## Alert routing
 
-`alertmanager/alertmanager.yml` currently uses a no-op receiver. Add email,
-webhook, DingTalk, WeCom, Feishu, or other receivers there when notification
-channels are ready.
+`alertmanager/alertmanager.yml` keeps a no-op default receiver and routes selected
+Mihomo availability alerts to the local Apprise API, which forwards them through
+the configured Bark target.
+
+Alertmanager runs as UID/GID `65534` (`nobody`) in the upstream container image,
+so `/data/homelab/lab/system-monitoring/alertmanager` must be writable by
+`65534:65534`; otherwise notification log and silence maintenance will fail with
+`permission denied`.
 
 ## Mihomo Proxy Monitoring
 

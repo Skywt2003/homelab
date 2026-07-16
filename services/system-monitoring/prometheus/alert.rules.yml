@@ -53,6 +53,15 @@ groups:
       - record: mihomo_selected_proxy_available
         expr: mihomo_proxy_available * on(proxy_name) group_left(group, proxy, type) label_replace(mihomo_proxy_group_selected, "proxy_name", "$1", "proxy", "(.*)")
 
+      - record: mihomo_proxy_real_available_nodes
+        expr: sum(mihomo_proxy_available{job="mihomo-exporter",proxy_name!~"^(PASS|PASS-RULE|REJECT-DROP|COMPATIBLE|Traffic:.*|Expire:.*)$"})
+
+      - record: mihomo_proxy_real_total_nodes
+        expr: count(mihomo_proxy_available{job="mihomo-exporter",proxy_name!~"^(PASS|PASS-RULE|REJECT-DROP|COMPATIBLE|Traffic:.*|Expire:.*)$"})
+
+      - record: mihomo_proxy_real_available_ratio
+        expr: mihomo_proxy_real_available_nodes / mihomo_proxy_real_total_nodes
+
   - name: mihomo-health
     rules:
       - alert: MihomoExporterDown
@@ -91,6 +100,24 @@ groups:
           summary: "Mihomo proxy has high probe failure ratio"
           description: "Proxy {{ $labels.proxy_name }} has probe failure ratio {{ $value }} over 5 minutes."
 
+      - alert: MihomoAvailableNodesTooLow
+        expr: mihomo_proxy_real_available_nodes < 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Mihomo available proxy nodes are too low"
+          description: "Only {{ $value | printf \"%.0f\" }} real Mihomo proxy nodes are currently available for more than 10 minutes."
+
+      - alert: MihomoAvailableNodeRatioTooLow
+        expr: mihomo_proxy_real_available_ratio < 0.20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Mihomo available proxy node ratio is too low"
+          description: "Only {{ $value | printf \"%.1f\" }} of real Mihomo proxy nodes are currently available for more than 10 minutes."
+
   - name: website-uptime
     rules:
       - alert: WebsiteDown
@@ -119,4 +146,3 @@ groups:
         annotations:
           summary: "TLS certificate expiring soon: {{ $labels.instance }}"
           description: "{{ $labels.instance }} certificate expires in less than 14 days."
-

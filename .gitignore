@@ -1,4 +1,5 @@
 .DS_Store
+logs/
 services/system-monitoring/.env
 services/system-monitoring/.env.local
 services/nexus-admin/.env

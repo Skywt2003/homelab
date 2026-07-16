@@ -6,9 +6,20 @@ route:
   group_by:
     - alertname
     - job
+  routes:
+    - receiver: apprise-bark
+      matchers:
+        - alertname=~"MihomoAvailable.*TooLow"
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 4h
 
 receivers:
   - name: default
+  - name: apprise-bark
+    webhook_configs:
+      - send_resolved: true
+        url: 'http://lab-apprise-api:8000/notify/apprise?:commonLabels.alertname=title&:commonAnnotations.description=body&:type=warning&:format=text'
