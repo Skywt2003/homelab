@@ -12,11 +12,11 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/calibre-web`: Calibre-Web ebook library for `books.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
 - `services/cronicle`: Cronicle web-managed task scheduler for `cron.lab.skywt`.
-- `services/dashy`: Dashy service index for `index.lab.skywt`.
 - `services/dns`: AdGuard Home DNS stack for `dns.lab.skywt`.
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/homelab-dashboard`: Docker-label-powered service dashboard for `dashboard.lab.skywt`.
 - `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.

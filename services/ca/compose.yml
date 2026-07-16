@@ -14,6 +14,13 @@ services:
       caddy: ca.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+      labdash.enable: "true"
+      labdash.name: ca
+      labdash.appname: Lab CA
+      labdash.url: https://ca.lab.skywt
+      labdash.icon: certificate
+      labdash.group: Infrastructure
+      labdash.order: "20"
 
 networks:
   lab-proxy:

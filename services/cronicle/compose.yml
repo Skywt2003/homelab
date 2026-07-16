@@ -30,6 +30,13 @@ services:
       caddy: cron.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3012}}"
+      labdash.enable: "true"
+      labdash.name: cron
+      labdash.appname: Cronicle
+      labdash.url: https://cron.lab.skywt
+      labdash.icon: alarm
+      labdash.group: Automation
+      labdash.order: "10"
 
 secrets:
   cronicle_secret_key:

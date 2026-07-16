@@ -29,6 +29,13 @@ services:
       caddy: ai-api.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+      labdash.enable: "true"
+      labdash.name: ai-api
+      labdash.appname: New API
+      labdash.url: https://ai-api.lab.skywt
+      labdash.icon: ai
+      labdash.group: Services
+      labdash.order: "30"
 
 networks:
   lab-proxy:

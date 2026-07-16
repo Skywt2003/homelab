@@ -23,6 +23,13 @@ services:
       caddy: secrets.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+      labdash.enable: "true"
+      labdash.name: secrets
+      labdash.appname: Infisical
+      labdash.url: https://secrets.lab.skywt
+      labdash.icon: key
+      labdash.group: Infrastructure
+      labdash.order: "40"
 
   infisical-db:
     image: postgres:14-alpine
@@ -49,7 +56,6 @@ services:
       - /data/homelab/lab/infisical/redis:/data
     networks:
       - infisical-internal
-
 networks:
   lab-proxy:
     external: true

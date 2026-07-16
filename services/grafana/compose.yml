@@ -17,6 +17,13 @@ services:
       caddy: grafana.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+      labdash.enable: "true"
+      labdash.name: grafana
+      labdash.appname: Grafana
+      labdash.url: https://grafana.lab.skywt
+      labdash.icon: chart-line
+      labdash.group: Observability
+      labdash.order: "20"
 
 networks:
   lab-proxy:

@@ -15,6 +15,13 @@ services:
       caddy: dns.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+      labdash.enable: "true"
+      labdash.name: dns
+      labdash.appname: AdGuard Home
+      labdash.url: https://dns.lab.skywt
+      labdash.icon: shield-check
+      labdash.group: Infrastructure
+      labdash.order: "30"
 
 networks:
   lab-proxy:

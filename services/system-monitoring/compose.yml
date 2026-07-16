@@ -23,6 +23,13 @@ services:
       caddy: prometheus.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9090}}"
+      labdash.enable: "true"
+      labdash.name: prometheus
+      labdash.appname: Prometheus
+      labdash.url: https://prometheus.lab.skywt
+      labdash.icon: activity
+      labdash.group: Observability
+      labdash.order: "10"
     logging: &default-logging
       driver: json-file
       options:
@@ -130,6 +137,13 @@ services:
       caddy: alertmanager.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9093}}"
+      labdash.enable: "true"
+      labdash.name: alertmanager
+      labdash.appname: Alertmanager
+      labdash.url: https://alertmanager.lab.skywt
+      labdash.icon: alert-triangle
+      labdash.group: Observability
+      labdash.order: "80"
     logging: *default-logging
 
 secrets:

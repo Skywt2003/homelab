@@ -19,6 +19,13 @@ services:
       caddy: notify.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8000}}"
+      labdash.enable: "true"
+      labdash.name: notify
+      labdash.appname: Apprise API
+      labdash.url: https://notify.lab.skywt
+      labdash.icon: bell
+      labdash.group: Services
+      labdash.order: "10"
 
 networks:
   lab-proxy:

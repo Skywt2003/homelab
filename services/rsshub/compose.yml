@@ -37,6 +37,13 @@ services:
       caddy: rsshub.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 1200}}"
+      labdash.enable: "true"
+      labdash.name: rsshub
+      labdash.appname: RSSHub
+      labdash.url: https://rsshub.lab.skywt
+      labdash.icon: rss
+      labdash.group: Services
+      labdash.order: "50"
 
   browserless:
     image: ghcr.io/browserless/chromium:latest

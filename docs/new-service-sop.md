@@ -58,6 +58,13 @@ services:
       caddy: <domain>.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams <port>}}"
+      labdash.enable: "true"
+      labdash.name: <short-name>
+      labdash.appname: <Display Name>
+      labdash.url: https://<domain>.lab.skywt
+      labdash.icon: <tabler-icon-name>
+      labdash.group: <Dashboard Group>
+      labdash.order: "<number>"
 
 networks:
   lab-proxy:
@@ -69,6 +76,9 @@ Rules:
 - Do not publish HTTP ports directly unless the service must bypass Caddy.
 - Put the service on `lab-proxy` so Caddy can reach it.
 - Use Docker labels for Caddy routing.
+- Add `labdash.*` labels only to the container that represents the service's user-accessible entrypoint. Do not label internal helper containers such as databases, Redis, browserless workers, exporters, or one-off jobs unless they have their own user-facing URL that should appear in the dashboard.
+- `labdash.url` should be the HTTPS user-facing URL. For services without a normal web UI, omit `labdash.url` or point it to a meaningful health/status endpoint only if users should click it.
+- Use a quoted string for `labdash.order` so Compose preserves it as a label value.
 - Mount Git-maintained config files from the service directory.
 - Mount mutable runtime data from `/data/homelab/lab/<service>/...`.
 - Mount secrets from `/run/homelab/secrets/<service>/...` through Docker Compose `secrets`, not as committed files.
@@ -172,25 +182,33 @@ sudo install -d -m 0700 /run/homelab/secrets/<service>
 
 Do not print secret values to the terminal or logs.
 
-## 8. Update Dashy Index
+## 8. Update HomeLab Dashboard Labels
 
-Add the new service to `services/dashy/conf.yml`:
+HomeLab Dashboard at `https://dashboard.lab.skywt` discovers services from Docker labels on running containers. The label prefix is `labdash`.
+
+Add these labels to the user-accessible container in the service's Compose file:
 
 ```yaml
-- title: <Display Name>
-  description: <Short purpose>
-  icon: <icon>
-  url: https://<domain>.lab.skywt
-  statusCheck: true
+labels:
+  labdash.enable: "true"
+  labdash.name: <short-name>
+  labdash.appname: <Display Name>
+  labdash.url: https://<domain>.lab.skywt
+  labdash.icon: <tabler-icon-name>
+  labdash.group: <Dashboard Group>
+  labdash.order: "<number>"
 ```
 
-For infrastructure components without a web UI, add a non-clickable item and set `statusCheck: false`.
+Rules:
 
-After changing Dashy config, reload Dashy:
+- Label exactly the service entrypoint that users should see in the dashboard.
+- Do not label internal dependency containers, for example Postgres, Redis, browserless, workers, exporters, or cache containers.
+- Omit `labdash.url` for non-clickable entries.
+- Keep `labdash.order` as a quoted string.
+- After deployment, verify the service appears in `https://dashboard.lab.skywt` or through the dashboard API:
 
 ```bash
-cd ~/homelab/services/dashy
-sudo docker compose -f compose.yml restart dashy
+sudo docker exec lab-homelab-dashboard sh -c 'wget -q -O- http://$(hostname):3000/api/items'
 ```
 
 ## 9. Update Documentation
@@ -299,7 +317,6 @@ The expected changes for a new service are usually:
 - `services/<service>/README.md`
 - Service config files under `services/<service>/`
 - Optional `.env.example` or `*.template` files with placeholders only
-- `services/dashy/conf.yml`
 - root `README.md`
 
 Avoid mixing unrelated changes into the same commit.

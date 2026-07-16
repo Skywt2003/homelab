@@ -16,6 +16,14 @@ services:
       - ./acme-server.Caddyfile:/etc/caddy/acme-server.Caddyfile:ro
       - /data/homelab/lab/caddy/data:/data
       - /data/homelab/lab/caddy/config:/config
+    labels:
+      labdash.enable: "true"
+      labdash.name: acme
+      labdash.appname: Caddy ACME
+      labdash.url: https://acme.lab.skywt/health
+      labdash.icon: route
+      labdash.group: Infrastructure
+      labdash.order: "10"
 
 networks:
   lab-proxy:

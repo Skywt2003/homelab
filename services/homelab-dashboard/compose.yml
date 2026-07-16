@@ -1,0 +1,29 @@
+services:
+  homelab-dashboard:
+    image: docker.lab.skywt/homelab-dashboard:latest
+    container_name: lab-homelab-dashboard
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LABDASH_LABEL_PREFIX: labdash
+    group_add:
+      - "989"
+    networks:
+      - lab-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      caddy: dashboard.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+      labdash.enable: "true"
+      labdash.name: dashboard
+      labdash.appname: HomeLab Dashboard
+      labdash.url: https://dashboard.lab.skywt
+      labdash.icon: layout-dashboard
+      labdash.group: Infrastructure
+      labdash.order: "5"
+
+networks:
+  lab-proxy:
+    external: true

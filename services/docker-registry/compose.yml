@@ -30,6 +30,13 @@ services:
       caddy: docker.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 5000}}"
+      labdash.enable: "true"
+      labdash.name: registry
+      labdash.appname: Docker Registry
+      labdash.url: https://docker.lab.skywt
+      labdash.icon: container
+      labdash.group: Development
+      labdash.order: "20"
 
 secrets:
   docker_registry_http_secret:

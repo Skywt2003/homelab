@@ -45,6 +45,13 @@ services:
       caddy: blog-admin.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+      labdash.enable: "true"
+      labdash.name: blog-admin
+      labdash.appname: Nexus Admin
+      labdash.url: https://blog-admin.lab.skywt
+      labdash.icon: news
+      labdash.group: Services
+      labdash.order: "40"
 
 secrets:
   nexus_admin_admin_password:

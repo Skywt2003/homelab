@@ -16,6 +16,13 @@ services:
       caddy: archive.lab.skywt
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8000}}"
+      labdash.enable: "true"
+      labdash.name: archive
+      labdash.appname: ArchiveBox
+      labdash.url: https://archive.lab.skywt
+      labdash.icon: archive
+      labdash.group: Personal
+      labdash.order: "10"
 
 networks:
   lab-proxy:
