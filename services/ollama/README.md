@@ -7,6 +7,11 @@ Model data is stored outside this repository at:
 
 - `/data/homelab/lab/ollama`
 
+The container is intentionally limited to 3 CPUs and 5.5 GiB of memory so a
+model request cannot consume every vCPU assigned to the shared `lab` VM. Only
+one model and one parallel request are allowed, the context is capped at 4096
+tokens, and idle models are unloaded after two minutes.
+
 Deploy the service and pull the default model:
 
 ```bash
