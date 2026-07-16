@@ -1,0 +1,33 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: lab-ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_KEEP_ALIVE: 10m
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    labels:
+      caddy: llm.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 11434}}"
+      labdash.enable: "true"
+      labdash.name: llm
+      labdash.appname: Ollama
+      labdash.url: https://llm.lab.skywt
+      labdash.icon: ai
+      labdash.group: Services
+      labdash.order: "40"
+
+networks:
+  lab-proxy:
+    external: true

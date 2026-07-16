@@ -18,6 +18,7 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/homelab-dashboard`: Docker-label-powered service dashboard for `dashboard.lab.skywt`.
 - `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
+- `services/ollama`: Ollama local model API for `llm.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
@@ -73,6 +74,7 @@ Current paths:
 - `/data/homelab/lab/infisical/postgres`
 - `/data/homelab/lab/infisical/redis`
 - `/data/homelab/lab/new-api/data`
+- `/data/homelab/lab/ollama`
 - `/data/homelab/lab/nexus-admin/env`
 - `/data/homelab/lab/rsshub/env`
 - `/data/homelab/lab/rsshub/redis`
@@ -103,6 +105,7 @@ sudo mkdir -p /data/homelab/lab/grafana/data
 sudo chown -R 472:472 /data/homelab/lab/grafana/data
 sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
 sudo mkdir -p /data/homelab/lab/new-api/data
+sudo mkdir -p /data/homelab/lab/ollama
 sudo mkdir -p /data/homelab/lab/nexus-admin/env
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
