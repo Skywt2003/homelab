@@ -1,0 +1,100 @@
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:v3.0.3
+    container_name: lab-immich
+    restart: unless-stopped
+    environment:
+      TZ: Etc/UTC
+      DB_HOSTNAME: database
+      DB_USERNAME: postgres
+      DB_PASSWORD_FILE: /run/secrets/database_password
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: redis
+    secrets:
+      - source: immich_database_password
+        target: database_password
+    networks:
+      - lab-proxy
+      - immich
+    volumes:
+      - immich-media:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - redis
+      - database
+    healthcheck:
+      disable: false
+    labels:
+      caddy: photos.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 2283}}"
+      labdash.enable: "true"
+      labdash.name: photos
+      labdash.appname: Immich
+      labdash.url: https://photos.lab.skywt
+      labdash.icon: photo
+      labdash.group: Personal
+      labdash.order: "10"
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:v3.0.3
+    container_name: lab-immich-machine-learning
+    restart: unless-stopped
+    environment:
+      TZ: Etc/UTC
+    networks:
+      - immich
+    volumes:
+      - model-cache:/cache
+    healthcheck:
+      disable: false
+
+  redis:
+    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
+    container_name: lab-immich-valkey
+    restart: unless-stopped
+    networks:
+      - immich
+    healthcheck:
+      test: redis-cli ping || exit 1
+
+  database:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    container_name: lab-immich-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: --data-checksums
+    secrets:
+      - source: immich_database_password
+        target: database_password
+    networks:
+      - immich
+    volumes:
+      - /data/homelab/lab/immich/postgres:/var/lib/postgresql/data
+    shm_size: 128mb
+    healthcheck:
+      disable: false
+
+networks:
+  lab-proxy:
+    external: true
+  immich:
+    name: lab-immich
+
+volumes:
+  immich-media:
+    name: lab-immich-media
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.21,rw,nfsvers=4.2,proto=tcp,hard,resvport
+      device: ":/Photos"
+  model-cache:
+    name: lab-immich-model-cache
+
+secrets:
+  immich_database_password:
+    file: /run/homelab/secrets/immich/database_password

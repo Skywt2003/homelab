@@ -82,6 +82,10 @@ materialize_docker_registry() {
   write_secret docker-registry /docker-registry REGISTRY_HTTP_SECRET http_secret
 }
 
+materialize_immich() {
+  write_secret immich /immich DB_PASSWORD database_password
+}
+
 materialize_nexus_admin() {
   write_secret nexus-admin /nexus-admin ADMIN_PASSWORD admin_password
   write_secret nexus-admin /nexus-admin RESEND_API_KEY resend_api_key
@@ -101,11 +105,13 @@ materialize_system_monitoring() {
 
 case "$action" in
   docker-registry) materialize_docker_registry ;;
+  immich) materialize_immich ;;
   nexus-admin) materialize_nexus_admin ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
   all)
     materialize_docker_registry
+    materialize_immich
     materialize_nexus_admin
     materialize_rsshub
     materialize_system_monitoring
