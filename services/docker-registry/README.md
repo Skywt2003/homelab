@@ -46,4 +46,4 @@ docker push docker.lab.skywt/alpine:latest
 docker pull docker.lab.skywt/alpine:latest
 ```
 
-This registry is intended for lab-internal use and does not publish port `5000` directly on the host. It is currently unauthenticated, so any client with network access and trust for the lab CA can push and pull images.
+This registry is available to the lab network through Caddy. Authentication is not enabled, so any client with network access and trust for the lab CA can push and pull images.

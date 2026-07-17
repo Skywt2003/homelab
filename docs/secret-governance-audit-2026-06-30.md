@@ -1,10 +1,10 @@
 # Secret Governance Audit - 2026-06-30 UTC
 
-This audit records the outcome of the Infisical and Docker Compose secrets migration for the `lab` host.
+This audit records the Infisical and Docker Compose secret-governance state of the `lab` host.
 
 ## Scope
 
-The migration targeted all repository-managed services under `services/` and specifically remediated services that previously used repo-local `.env` files or inline secret-like values:
+The audit covered repository-wide secret handling and the materialized secrets for:
 
 - `services/docker-registry`
 - `services/nexus-admin`
@@ -15,7 +15,7 @@ Infisical itself remains a bootstrap exception. Its runtime bootstrap file stays
 
 ## Infisical paths
 
-Secrets were imported and verified in these Infisical paths under project `homelab`, environment `prod`:
+Secrets were verified in these Infisical paths under project `homelab`, environment `prod`:
 
 | Path | Secret names |
 | --- | --- |
@@ -23,8 +23,6 @@ Secrets were imported and verified in these Infisical paths under project `homel
 | `/nexus-admin` | `ADMIN_PASSWORD`, `RESEND_API_KEY`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `SUPABASE_SECRET_KEY` |
 | `/rsshub` | `TWITTER_AUTH_TOKEN` |
 | `/system-monitoring` | `MIHOMO_API_TOKEN` |
-
-The one-time legacy import files under `/data/homelab/lab/legacy-secrets` were removed after import, materialization, service restart, and verification.
 
 ## Runtime materialization
 
@@ -52,13 +50,12 @@ Non-secret public env files live outside Git:
 
 Commands were run without printing secret values.
 
-- Infisical read verification passed for all migrated secret names.
+- Infisical read verification passed for all listed secret names.
 - No repo-local `.env`, `.env.local`, or `*.env` files were found under `services/`.
-- `/data/homelab/lab/legacy-secrets` contained no files after cleanup.
 - `docker compose -f compose.yml config` passed for every stack under `services/`.
 - `git diff --check` passed.
-- Pattern scan did not find committed private keys, obvious provider tokens, or inline values for the migrated secret names.
-- Docker inspect showed no migrated secret keys in container `Config.Env` for:
+- Pattern scan did not find committed private keys, obvious provider tokens, or inline values for the listed secret names.
+- Docker inspect showed no listed secret keys in container `Config.Env` for:
   - `lab-docker-registry`
   - `lab-nexus-admin`
   - `lab-rsshub`
@@ -92,4 +89,4 @@ Redirect statuses are expected for services that send unauthenticated users to l
 
 - Docker Compose emits warnings that `uid`, `gid`, and `mode` are ignored for file-backed secrets outside Swarm. Source files under `/run/homelab/secrets` are still managed with restrictive host permissions where practical.
 - Some upstream images only accept secrets through environment variables. For those, Compose mounts Docker secret files and uses an entrypoint/command wrapper to export the environment variable immediately before the original process starts.
-- The Infisical client credential file `/data/homelab/lab/infisical/client.env` is outside Git and should be kept `0600 root:root`. After migration, prefer a read-only identity for routine `materialize-secrets.sh` runs.
+- The Infisical client credential file `/data/homelab/lab/infisical/client.env` is outside Git and should be kept `0600 root:root`. Use a read-only identity for routine `materialize-secrets.sh` runs.

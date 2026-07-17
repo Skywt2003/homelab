@@ -13,9 +13,7 @@ Runtime state is stored outside this Git repository:
 
 ## Secrets
 
-This stack currently has no Compose-mounted secrets.
-
-Calibre-Web users, passwords, and application-generated credentials live in the runtime config directory and must not be copied into Git. If future bootstrap credentials are needed, store them in Infisical and mount them according to `docs/secret-management-sop.md`.
+Calibre-Web users, passwords, and application-generated credentials live in the runtime config directory and must not be copied into Git. Provisioned bootstrap credentials belong in Infisical and follow the [Secret Management SOP](../../docs/secret-management-sop.md).
 
 ## Import Existing Library
 

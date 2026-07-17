@@ -25,7 +25,7 @@ The container is configured to route outbound API/provider traffic through the l
 
 Provider API keys, model relay credentials, admin credentials, and user tokens are secrets.
 
-New API stores most operational secrets in its runtime database under `/data/homelab/lab/new-api/data`; do not copy that data into Git. If future bootstrap or provider credentials are supplied through Compose, store them in Infisical first and mount them according to `docs/secret-management-sop.md`.
+New API stores operational secrets in its runtime database under `/data/homelab/lab/new-api/data`; do not copy that data into Git. Credentials supplied through Compose belong in Infisical and follow the [Secret Management SOP](../../docs/secret-management-sop.md).
 
 Default or first-run admin passwords are externally-generated or service-generated secrets until changed and recorded in the appropriate password manager/Infisical workflow.
 

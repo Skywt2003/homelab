@@ -25,7 +25,7 @@ The following are externally-generated bootstrap secrets and live only in `/data
 
 Keep the file `0600 root:root`. Do not paste `docker compose config` output for this stack because Compose expands `env_file` values into the rendered config.
 
-For secrets managed for other lab services, use Infisical project `homelab`, environment `prod`, path `/<service>`, and the workflow in `docs/secret-management-sop.md`.
+For secrets managed for other lab services, use Infisical project `homelab`, environment `prod`, path `/<service>`, and the [Secret Management SOP](../../docs/secret-management-sop.md).
 
 ## Deploy
 

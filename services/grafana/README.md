@@ -4,9 +4,8 @@ This stack runs Grafana for `grafana.lab.skywt`.
 
 The Web UI is exposed through the shared Caddy reverse proxy by labels in `compose.yml`.
 
-
 Provisioned datasources are maintained under `provisioning/datasources/`. The
-`System Monitoring` Prometheus datasource points to the separate
+`System Monitoring` Prometheus datasource points to the
 `services/system-monitoring` stack over the shared Docker network.
 Provisioned dashboards are maintained under `dashboards/` and loaded by
 `provisioning/dashboards/`. The initial dashboard is `Lab Host Overview`.
@@ -17,9 +16,7 @@ Runtime state is stored outside this Git repository:
 
 ## Secrets
 
-This stack currently has no Compose-mounted secrets.
-
-Grafana users, sessions, API keys, and datasource credentials live in Grafana runtime data unless explicitly provisioned. Do not commit datasource credentials in provisioning files. Future provisioned credentials must come from Infisical and be mounted according to `docs/secret-management-sop.md`.
+Grafana users, sessions, API keys, and datasource credentials live in Grafana runtime data unless explicitly provisioned. Provisioned credentials belong in Infisical and follow the [Secret Management SOP](../../docs/secret-management-sop.md); keep them out of provisioning files.
 
 ## Deploy
 

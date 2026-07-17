@@ -1,8 +1,6 @@
 # Homelab
 
-Configuration for services running on the `lab` host only.
-
-This repository intentionally no longer manages `dev` host projects. Development projects on `dev` are expected to be run and exposed independently from this Docker-based lab service layout.
+Configuration for services running on the `lab` host.
 
 ## Layout
 
@@ -24,11 +22,10 @@ This repository intentionally no longer manages `dev` host projects. Development
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
 - `docs`: operating procedures and audit notes.
 
-## SOPs
+## Documentation
 
 - [New Service SOP](docs/new-service-sop.md)
 - [Secret Management SOP](docs/secret-management-sop.md)
-- [Service Status Audit](docs/service-status-audit.md)
 - [Secret Governance Audit - 2026-06-30](docs/secret-governance-audit-2026-06-30.md)
 
 ## Secret Management
@@ -49,7 +46,7 @@ Secret origin classes:
 
 Exception: Infisical's own bootstrap secrets live outside Git in `/data/homelab/lab/infisical/env/infisical.env` because Infisical cannot depend on itself to start. Back up that file securely together with Infisical PostgreSQL data.
 
-Service secrets are materialized with `scripts/materialize-secrets.sh`. Do not copy legacy repo-local `.env` patterns into new services.
+Service secrets are materialized with `scripts/materialize-secrets.sh` before deployment.
 
 ## Runtime Data
 
@@ -126,5 +123,3 @@ Before deploying services that use secrets, materialize current values from Infi
 # Requires /data/homelab/lab/infisical/client.env with INFISICAL_PROJECT_ID and either INFISICAL_CLIENT_ID/INFISICAL_CLIENT_SECRET or INFISICAL_TOKEN.
 sudo ./scripts/materialize-secrets.sh all
 ```
-
-`sudo ./scripts/import-legacy-secrets.sh` was used for the one-time migration from root-only legacy files into Infisical. Do not recreate legacy secret files for normal operation.

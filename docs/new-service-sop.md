@@ -16,8 +16,8 @@ This SOP describes how to add and deploy a new service on the `lab` host.
 
 Decide these values before creating files:
 
-- Service name: lowercase directory name, for example `dashy`.
-- Container name: `lab-<service>`, for example `lab-dashy`.
+- Service name: lowercase directory name, for example `example-app`.
+- Container name: `lab-<service>`, for example `lab-example-app`.
 - Domain: `<name>.lab.skywt`, for example `index.lab.skywt`.
 - Upstream port: the port exposed by the container inside the Docker network.
 - Runtime data path, if the service needs persistent state.
@@ -238,9 +238,9 @@ cd ~/homelab/services/<service>
 docker compose -f compose.yml config
 ```
 
-For standard new services, this should show only secret file paths, not secret values.
+The output should show secret file paths rather than secret values.
 
-Do not paste or share `docker compose config` output for bootstrap or legacy stacks that still use secret-bearing `env_file` entries. If only syntax validation is needed for those stacks, redirect output:
+For bootstrap stacks whose `env_file` contains secrets, such as Infisical, redirect the rendered configuration to `/dev/null` when only syntax validation is needed:
 
 ```bash
 sudo docker compose -f compose.yml config >/dev/null

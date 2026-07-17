@@ -54,7 +54,7 @@ Exporter，用于从 [Mihomo](https://github.com/MetaCubeX/mihomo) 中导出详�
 
 - Mihomo `secret` 由 `proxy` 主机上的 Mihomo 配置生成和持有，因此属于 externally-generated secret。
 - 最终 token 存入 Infisical 的 `/system-monitoring` 路径，并由部署流程 materialize 到 Docker secret 文件。
-- homelab Compose 不改 exporter 镜像；它通过 Docker secret 文件和 shell wrapper 在进程启动前注入 `MIHOMO_API_TOKEN`。
+- homelab Compose 通过 Docker secret 文件和 shell wrapper 在进程启动前注入 `MIHOMO_API_TOKEN`。
 - 以下示例只能使用占位符，不得替换成真实 token 后提交。
 
 ## 使用方法
@@ -160,7 +160,7 @@ scrape_configs:
 **基数说明**：
 - **精准流量指标**：固定 2 个时间序列（推荐用于计算速率）
 - **低基数聚合指标**：基数可控，通常 < 1000 个时间序列（推荐用于监控）
-- **原有指标**：基数可能很高（10000+），建议在生产环境中谨慎使用
+- **逐连接指标**：基数可能很高（10000+），建议在生产环境中谨慎使用
 
 ## PromQL 查询示例 (Grafana 看板示例)
 

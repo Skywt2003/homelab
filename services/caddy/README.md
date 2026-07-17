@@ -18,5 +18,3 @@ Caddy runtime state is stored outside this Git repository:
 ## Secrets
 
 Caddy's internal CA private keys and ACME/runtime state under `/data/homelab/lab/caddy/data` are secrets. The public root certificate is not a secret.
-
-This stack currently has no Compose-mounted secrets. If future Caddy credentials are required, classify them under `docs/secret-management-sop.md` and mount them from `/run/homelab/secrets/caddy` through Docker Compose secrets.

@@ -1,10 +1,6 @@
 # System Monitoring
 
-This stack runs the system-monitoring part of the Prometheus stack for the `lab` host.
-
-It intentionally does **not** run Grafana. Grafana is maintained as the independent
-`services/grafana` project so it can also be used for non-system-monitoring data.
-This stack only provides metrics collection, storage, push metrics, and alert routing.
+This stack provides metrics collection, storage, push metrics, and alert routing for the `lab` host. Dashboards and visualization are provided by `services/grafana`.
 
 ## Components
 
@@ -27,7 +23,7 @@ Runtime state is stored outside this Git repository:
 
 The Grafana project provisions a Prometheus datasource named `System Monitoring`
 that points to `http://lab-prometheus:9090` over the shared `lab-proxy` Docker
-network. This keeps Grafana reusable while letting it read this stack's metrics.
+network.
 
 After deployment, import or build dashboards in Grafana at `https://grafana.lab.skywt`.
 Good starter dashboards are Node Exporter and Docker/cAdvisor dashboards from the
@@ -97,5 +93,3 @@ Components:
 - Grafana dashboard `Mihomo Proxy Overview` provisioned under the `System Monitoring` folder.
 
 The exporter runs on `lab` and reads Mihomo's External Controller on the `proxy` Tailscale address `http://100.64.0.7:9090`. The controller is protected by Mihomo's `secret`, and metrics are stored in Prometheus on `lab`.
-
-`MIHOMO_API_TOKEN` is no longer read from a repo-local `.env`; after import/materialization it is loaded from the Docker secret file described above. The temporary legacy import file has been removed after verification.

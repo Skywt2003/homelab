@@ -134,14 +134,11 @@ Rules:
 - Without `ENCRYPTION_KEY`, restored encrypted secrets cannot be decrypted.
 - Do not run or share commands that print this env file or expand it through `docker compose config` output.
 
-## Repository helper scripts
+## Repository helper script
 
-This repository provides two helper scripts:
+`scripts/materialize-secrets.sh <service|all>` fetches service secrets from Infisical and writes Docker Compose secret source files under `/run/homelab/secrets/<service>/`.
 
-- `scripts/import-legacy-secrets.sh`: one-time migration helper that imports known legacy secret values from root-only `/data/homelab/lab/legacy-secrets/*.env` files into Infisical paths and rotates the Docker Registry HTTP secret. Remove those legacy files after verification.
-- `scripts/materialize-secrets.sh <service|all>`: fetches service secrets from Infisical and writes Docker Compose secret source files under `/run/homelab/secrets/<service>/`.
-
-Both scripts require a root-only client file on the lab host:
+The script requires a root-only client file on the lab host:
 
 ```bash
 sudo install -d -m 0700 /data/homelab/lab/infisical
@@ -149,8 +146,7 @@ sudo install -m 0600 /dev/stdin /data/homelab/lab/infisical/client.env <<'EOF'
 INFISICAL_DOMAIN=http://127.0.0.1:8080
 INFISICAL_ENV=prod
 INFISICAL_PROJECT_ID=<homelab-project-id>
-# Preferred: Universal Auth client credentials for a machine identity with read/write access during migration,
-# and read access for ongoing materialization.
+# Preferred: Universal Auth client credentials for a read-only machine identity.
 INFISICAL_CLIENT_ID=<machine-identity-client-id>
 INFISICAL_CLIENT_SECRET=<machine-identity-client-secret>
 # Alternative: a project-scoped access token.
@@ -158,7 +154,7 @@ INFISICAL_CLIENT_SECRET=<machine-identity-client-secret>
 EOF
 ```
 
-Never commit `client.env`, print it, or paste it into issue/PR comments. After initial import, prefer a read-only identity/token for ongoing materialization.
+Never commit `client.env`, print it, or paste it into issue/PR comments. Use a read-only identity or token for routine materialization.
 
 ## Deploy-time materialization
 
@@ -210,9 +206,8 @@ Operational rules:
 
 ## Validation rules
 
-- `docker compose config` is safe for new-standard services only when it shows secret file paths, not secret values.
-- Avoid printing `docker compose config` output for legacy or bootstrap stacks that still use secret-bearing `env_file` entries.
-- For those stacks, redirect output to `/dev/null` if only syntax validation is needed:
+- `docker compose config` is safe to display when it shows secret file paths rather than secret values.
+- For bootstrap stacks whose `env_file` contains secrets, redirect output to `/dev/null` when only syntax validation is needed:
 
 ```bash
 sudo docker compose -f compose.yml config >/dev/null
@@ -230,17 +225,3 @@ When rotating a secret:
 4. Recreate or restart the affected container.
 5. Verify the application and logs.
 6. Revoke or remove the old value from the upstream system when applicable.
-
-## Legacy services
-
-Some existing services may still use `.env` files or inline secret-like values until the 存量治理 step is complete.
-
-Rules for legacy services before migration:
-
-- If a repo-local legacy `.env` still exists, move it to `/data/homelab/lab/legacy-secrets/<service>.env` with mode `0600 root:root` before import.
-- After import, materialization, service restart, and verification, delete `/data/homelab/lab/legacy-secrets/<service>.env`; Infisical becomes the only persistent source for that secret.
-
-- Keep real `.env` files ignored by Git.
-- Do not add new secrets to Git-maintained files.
-- Do not copy legacy `.env` patterns into new services.
-- When touching a legacy service for secret-related work, migrate it to this SOP instead of extending the old pattern.
