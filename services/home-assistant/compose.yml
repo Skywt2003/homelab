@@ -1,0 +1,24 @@
+services:
+  home-assistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: lab-home-assistant
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      TZ: Etc/UTC
+    volumes:
+      - /data/homelab/lab/home-assistant/config:/config
+      - ./configuration.yaml:/config/configuration.yaml:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    labels:
+      labdash.enable: "true"
+      labdash.name: home
+      labdash.appname: Home Assistant
+      labdash.url: https://home.lab.skywt
+      labdash.icon: home
+      labdash.group: Personal
+      labdash.order: "50"

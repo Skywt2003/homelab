@@ -4,6 +4,8 @@ This stack runs the shared reverse proxy for the `lab` host.
 
 Routes are managed by Docker labels on other Compose stacks. For example, the DNS stack publishes AdGuard Home at `https://dns.lab.skywt`.
 
+Home Assistant is the exception: it uses host networking for local device discovery, so `home.lab.skywt` is defined in `acme-server.Caddyfile` and proxies to `host.docker.internal:8123`. The Compose `host-gateway` entry makes that name resolve to the `lab` host from inside Caddy.
+
 The same Caddy instance also exposes the internal ACME server at `https://acme.lab.skywt` for selected internal names. It currently allows `*.lab.skywt`, `*.dev.skywt`, and `nas.skywt`; the NAS host runs its own Caddy and obtains the `nas.skywt` certificate from this ACME server.
 
 Caddy owns the shared Docker network:

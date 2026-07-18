@@ -13,6 +13,7 @@ Configuration for services running on the `lab` host.
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
+- `services/home-assistant`: Home Assistant for `home.lab.skywt` with AX200 Bluetooth access.
 - `services/homelab-dashboard`: Docker-label-powered service dashboard for `dashboard.lab.skywt`.
 - `services/immich`: Immich photo and video management for `photos.lab.skywt`.
 - `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
@@ -68,6 +69,7 @@ Current paths:
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
+- `/data/homelab/lab/home-assistant/config`
 - `/data/homelab/lab/immich/postgres`
 - `/data/homelab/lab/infisical/env`
 - `/data/homelab/lab/infisical/postgres`
@@ -102,6 +104,7 @@ sudo mkdir -p /data/homelab/lab/gitea/data
 sudo chown -R 1000:1000 /data/homelab/lab/gitea/data
 sudo mkdir -p /data/homelab/lab/grafana/data
 sudo chown -R 472:472 /data/homelab/lab/grafana/data
+sudo mkdir -p /data/homelab/lab/home-assistant/config
 sudo mkdir -p /data/homelab/lab/immich/postgres
 sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
 sudo mkdir -p /data/homelab/lab/new-api/data

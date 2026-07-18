@@ -15,3 +15,11 @@ acme.lab.skywt {
 
 	respond /health "ok"
 }
+
+# Home Assistant uses host networking for local discovery and Bluetooth.
+# It cannot join lab-proxy, so proxy to the lab host through Docker's stable
+# host-gateway alias instead of a caddy-docker-proxy upstream label.
+home.lab.skywt {
+	tls internal
+	reverse_proxy host.docker.internal:8123
+}

@@ -9,6 +9,8 @@ services:
       - "443:443"
     environment:
       CADDY_INGRESS_NETWORKS: lab-proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - lab-proxy
     volumes:
