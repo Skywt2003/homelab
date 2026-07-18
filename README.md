@@ -49,6 +49,9 @@ Secret origin classes:
 Exception: Infisical's own bootstrap secrets live outside Git in `/data/homelab/lab/infisical/env/infisical.env` because Infisical cannot depend on itself to start. Back up that file securely together with Infisical PostgreSQL data.
 
 Service secrets are materialized with `scripts/materialize-secrets.sh` before deployment.
+At boot, `homelab-secret-dependent-services.service` waits for Infisical,
+materializes all service secrets, and restores the Compose stacks that consume
+them. See [Secret Management SOP](docs/secret-management-sop.md#boot-time-recovery).
 
 ## Runtime Data
 

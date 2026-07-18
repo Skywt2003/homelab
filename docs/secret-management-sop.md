@@ -156,6 +156,40 @@ EOF
 
 Never commit `client.env`, print it, or paste it into issue/PR comments. Use a read-only identity or token for routine materialization.
 
+## Boot-time recovery
+
+`/run/homelab/secrets` is cleared on every reboot. Docker may try to restore
+containers before their Compose secret source files exist, and an OCI mount
+failure is not retried by the container restart policy.
+
+The `homelab-secret-dependent-services.service` systemd unit waits for Docker
+and retries secret materialization until Infisical is ready. It then runs
+`docker compose up -d` for each stack that consumes materialized secrets.
+Immich is restored last so an unavailable NAS/NFS export does not delay stacks
+whose storage is local to `lab`.
+
+Install or update the unit on the `lab` host with:
+
+```bash
+sudo install -m 0644 \
+  systemd/homelab-secret-dependent-services.service \
+  /etc/systemd/system/homelab-secret-dependent-services.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now homelab-secret-dependent-services.service
+```
+
+Validate it with:
+
+```bash
+systemctl status homelab-secret-dependent-services.service
+sudo journalctl -u homelab-secret-dependent-services.service -b
+```
+
+When adding another Compose stack that reads files from
+`/run/homelab/secrets`, add its materialization function to
+`scripts/materialize-secrets.sh` and its service directory name to
+`scripts/restore-secret-dependent-services.sh`.
+
 ## Deploy-time materialization
 
 Before starting a service that needs secrets, fetch the required values from Infisical into `/run/homelab/secrets/<service>/`.
