@@ -15,6 +15,12 @@ services:
       - /data/homelab/lab/apprise-api/config:/config
       - /data/homelab/lab/apprise-api/attach:/attach
       - /data/homelab/lab/apprise-api/plugin:/plugin
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/status', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     labels:
       caddy: notify.lab.skywt
       caddy.tls: internal

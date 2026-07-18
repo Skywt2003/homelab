@@ -12,6 +12,12 @@ services:
     volumes:
       - /data/homelab/lab/archivebox/data:/data
     shm_size: 1gb
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--header", "Host: archive.lab.skywt", "http://127.0.0.1:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     labels:
       caddy: archive.lab.skywt
       caddy.tls: internal

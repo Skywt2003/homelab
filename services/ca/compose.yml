@@ -10,6 +10,12 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./public:/srv/site:ro
       - /data/homelab/lab/caddy/data:/srv/caddy-data:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       caddy: ca.lab.skywt
       caddy.tls: internal

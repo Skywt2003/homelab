@@ -11,6 +11,12 @@ services:
     volumes:
       - /data/homelab/lab/adguard/work:/opt/adguardhome/work
       - /data/homelab/lab/adguard/conf:/opt/adguardhome/conf
+    healthcheck:
+      test: ["CMD", "/opt/adguardhome/AdGuardHome", "--check-config", "-c", "/opt/adguardhome/conf/AdGuardHome.yaml"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       caddy: dns.lab.skywt
       caddy.tls: internal

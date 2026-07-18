@@ -19,6 +19,12 @@ services:
       - /data/homelab/lab/system-monitoring/prometheus:/prometheus
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     labels:
       caddy: prometheus.lab.skywt
       caddy.tls: internal
@@ -133,6 +139,12 @@ services:
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - /data/homelab/lab/system-monitoring/alertmanager:/alertmanager
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     labels:
       caddy: alertmanager.lab.skywt
       caddy.tls: internal
