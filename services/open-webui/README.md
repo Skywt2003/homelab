@@ -9,6 +9,10 @@ the shared `lab-proxy` Docker network:
 - Ollama URL: `http://lab-ollama:11434`
 - Public Open WebUI URL: `https://ai.lab.skywt`
 
+Models installed in Ollama are discovered automatically by Open WebUI. The
+recommended model for normal chat is `qwen3:4b-instruct`; refresh the browser's
+model selector after pulling a new model if it is already open.
+
 Additional OpenAI-compatible providers, including New API, can be configured
 after login from **Admin Settings > Connections**. Use
 `http://lab-new-api:3000/v1` when connecting to the local New API container so

@@ -12,13 +12,21 @@ model request cannot consume every vCPU assigned to the shared `lab` VM. Only
 one model and one parallel request are allowed, the context is capped at 4096
 tokens, and idle models are unloaded after two minutes.
 
+External model downloads use the lab HTTP proxy at `proxy:10810`. Local
+containers and `*.lab.skywt` bypass it through `NO_PROXY`; the proxy hostname
+is pinned to `100.64.0.7` in `compose.yml`.
+
 Deploy the service and pull the default model:
 
 ```bash
 sudo mkdir -p /data/homelab/lab/ollama
 sudo docker compose -f compose.yml up -d
-sudo docker exec lab-ollama ollama pull qwen3:4b
+sudo docker exec lab-ollama ollama pull qwen3:4b-instruct
 ```
+
+`qwen3:4b-instruct` is the recommended model for normal chat. The shorter
+`qwen3:4b` tag currently refers to the thinking variant and is better reserved
+for prompts where extended reasoning is useful.
 
 Check the API:
 
