@@ -86,6 +86,10 @@ materialize_immich() {
   write_secret immich /immich DB_PASSWORD database_password
 }
 
+materialize_android_scrcpy() {
+  write_secret android-scrcpy /android-scrcpy VNC_PASSWORD vnc_password
+}
+
 materialize_nexus_admin() {
   write_secret nexus-admin /nexus-admin ADMIN_PASSWORD admin_password
   write_secret nexus-admin /nexus-admin RESEND_API_KEY resend_api_key
@@ -104,12 +108,14 @@ materialize_system_monitoring() {
 }
 
 case "$action" in
+  android-scrcpy) materialize_android_scrcpy ;;
   docker-registry) materialize_docker_registry ;;
   immich) materialize_immich ;;
   nexus-admin) materialize_nexus_admin ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
   all)
+    materialize_android_scrcpy
     materialize_docker_registry
     materialize_immich
     materialize_nexus_admin

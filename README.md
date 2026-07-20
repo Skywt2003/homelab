@@ -5,6 +5,7 @@ Configuration for services running on the `lab` host.
 ## Layout
 
 - `services/apprise-api`: Apprise API notification gateway for `notify.lab.skywt`.
+- `services/android-scrcpy`: Browser-accessible Android remote control for `phone.lab.skywt`.
 - `services/archivebox`: ArchiveBox for `archive.lab.skywt`.
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/calibre-web`: Calibre-Web ebook library for `books.lab.skywt`.
@@ -17,6 +18,7 @@ Configuration for services running on the `lab` host.
 - `services/homelab-dashboard`: Docker-label-powered service dashboard for `dashboard.lab.skywt`.
 - `services/immich`: Immich photo and video management for `photos.lab.skywt`.
 - `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
+- `services/moviepilot`: MoviePilot media automation and qBittorrent for `media.lab.skywt` and `torrent.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/ollama`: Ollama local model API for `llm.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
@@ -59,6 +61,7 @@ Mutable runtime state is not maintained in Git. It lives under `/data/homelab/la
 
 Current paths:
 
+- `/data/homelab/lab/android-scrcpy/adb`
 - `/data/homelab/lab/adguard/conf`
 - `/data/homelab/lab/adguard/work`
 - `/data/homelab/lab/apprise-api/config`
@@ -77,6 +80,9 @@ Current paths:
 - `/data/homelab/lab/infisical/env`
 - `/data/homelab/lab/infisical/postgres`
 - `/data/homelab/lab/infisical/redis`
+- `/data/homelab/lab/moviepilot/config`
+- `/data/homelab/lab/moviepilot/core`
+- `/data/homelab/lab/moviepilot/qbittorrent`
 - `/data/homelab/lab/new-api/data`
 - `/data/homelab/lab/ollama`
 - `/data/homelab/lab/nexus-admin/env`
@@ -97,6 +103,7 @@ sudo docker compose -f compose.yml up -d
 Services with first-run data directories may need preparation:
 
 ```bash
+sudo install -d -m 0700 -o root -g root /data/homelab/lab/android-scrcpy/adb
 sudo mkdir -p /data/homelab/lab/apprise-api/{config,attach,plugin}
 sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 sudo mkdir -p /data/homelab/lab/archivebox/data
@@ -110,6 +117,7 @@ sudo chown -R 472:472 /data/homelab/lab/grafana/data
 sudo mkdir -p /data/homelab/lab/home-assistant/config
 sudo mkdir -p /data/homelab/lab/immich/postgres
 sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
+sudo install -d -m 0775 -o 1000 -g 1000 /data/homelab/lab/moviepilot/{config,core,qbittorrent}
 sudo mkdir -p /data/homelab/lab/new-api/data
 sudo mkdir -p /data/homelab/lab/ollama
 sudo mkdir -p /data/homelab/lab/nexus-admin/env

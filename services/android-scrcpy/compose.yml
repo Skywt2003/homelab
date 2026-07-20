@@ -1,0 +1,79 @@
+services:
+  android-adb:
+    build:
+      context: .
+      args:
+        SCRCPY_VERSION: "4.1"
+        SCRCPY_SHA256: ad56ae8bfeedf41e824945c11dbf55fcb092b3e615b9b486f48a50e30d389635
+    image: lab/android-scrcpy:4.1
+    container_name: lab-android-adb
+    restart: unless-stopped
+    command: ["adb-server"]
+    environment:
+      HOME: /var/lib/android
+    networks:
+      - android-adb
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - /data/homelab/lab/android-scrcpy/adb:/var/lib/android/.android
+    device_cgroup_rules:
+      - "c 189:* rmw"
+    healthcheck:
+      test: ["CMD-SHELL", "ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 adb devices | grep -q '9c9c03f[[:space:]]*device'"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+
+  android-scrcpy:
+    image: lab/android-scrcpy:4.1
+    container_name: lab-android-scrcpy
+    restart: unless-stopped
+    depends_on:
+      android-adb:
+        condition: service_healthy
+    environment:
+      ADB_SERVER_SOCKET: tcp:android-adb:5037
+      ADB_SERIAL: 9c9c03f
+      VNC_GEOMETRY: 540x1120
+      SCRCPY_MAX_SIZE: "1080"
+      SCRCPY_MAX_FPS: "30"
+      SCRCPY_VIDEO_BIT_RATE: 6M
+      TZ: Etc/UTC
+    networks:
+      - android-adb
+      - lab-proxy
+    secrets:
+      - source: android_scrcpy_vnc_password
+        target: vnc_password
+        mode: 0400
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /run/scrcpy.pid && kill -0 $$(cat /run/scrcpy.pid) && curl --fail --silent http://127.0.0.1:6080/vnc.html >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      caddy: phone.lab.skywt
+      caddy.tls: internal
+      caddy.@root.path: /
+      caddy.redir: "@root /vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=true 302"
+      caddy.reverse_proxy: "{{upstreams 6080}}"
+      labdash.enable: "true"
+      labdash.name: phone
+      labdash.appname: Android Remote
+      labdash.url: "https://phone.lab.skywt/vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=true"
+      labdash.icon: device-mobile
+      labdash.group: Personal
+      labdash.order: "60"
+
+secrets:
+  android_scrcpy_vnc_password:
+    file: /run/homelab/secrets/android-scrcpy/vnc_password
+
+networks:
+  android-adb:
+    name: android-scrcpy-adb
+    internal: true
+  lab-proxy:
+    external: true

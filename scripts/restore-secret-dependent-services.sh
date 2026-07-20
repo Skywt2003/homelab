@@ -36,6 +36,7 @@ done
 # Keep Immich last so an unavailable NAS/NFS export cannot delay recovery of
 # the services whose storage is local to lab.
 services=(
+  android-scrcpy
   docker-registry
   nexus-admin
   rsshub

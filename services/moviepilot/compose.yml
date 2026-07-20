@@ -1,0 +1,108 @@
+services:
+  moviepilot:
+    image: jxxghp/moviepilot-v2:2.14.5
+    container_name: lab-moviepilot
+    hostname: lab-moviepilot
+    restart: unless-stopped
+    environment:
+      NGINX_PORT: "3000"
+      PORT: "3001"
+      PUID: "1000"
+      PGID: "1000"
+      UMASK: "002"
+      TZ: Etc/UTC
+      SUPERUSER: admin
+      APP_DOMAIN: https://media.lab.skywt
+      MOVIEPILOT_AUTO_UPDATE: "false"
+      AUTO_UPDATE_RESOURCE: "true"
+    networks:
+      - lab-proxy
+      - moviepilot
+    volumes:
+      - /data/homelab/lab/moviepilot/config:/config
+      - /data/homelab/lab/moviepilot/core:/moviepilot/.cloakbrowser
+      - type: volume
+        source: moviepilot-media
+        target: /media
+        volume:
+          nocopy: true
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    labels:
+      caddy: media.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+      labdash.enable: "true"
+      labdash.name: media
+      labdash.appname: MoviePilot
+      labdash.url: https://media.lab.skywt
+      labdash.icon: movie
+      labdash.group: Personal
+      labdash.order: "30"
+    logging: &default-logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:5.2.3_v2.0.13-ls468
+    container_name: lab-moviepilot-qbittorrent
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      UMASK: "002"
+      TZ: Etc/UTC
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "51413"
+    ports:
+      - "51413:51413/tcp"
+      - "51413:51413/udp"
+    networks:
+      - lab-proxy
+      - moviepilot
+    volumes:
+      - /data/homelab/lab/moviepilot/qbittorrent:/config
+      - type: volume
+        source: moviepilot-media
+        target: /media
+        volume:
+          nocopy: true
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      caddy: torrent.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      labdash.enable: "true"
+      labdash.name: torrent
+      labdash.appname: qBittorrent
+      labdash.url: https://torrent.lab.skywt
+      labdash.icon: download
+      labdash.group: Personal
+      labdash.order: "40"
+    logging: *default-logging
+
+networks:
+  lab-proxy:
+    external: true
+  moviepilot:
+    name: lab-moviepilot
+
+volumes:
+  moviepilot-media:
+    name: lab-moviepilot-media
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.21,rw,nfsvers=4.2,proto=tcp,hard,resvport
+      device: ":/Media"
