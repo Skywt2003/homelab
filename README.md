@@ -21,6 +21,7 @@ Configuration for services running on the `lab` host.
 - `services/moviepilot`: MoviePilot media automation and qBittorrent for `media.lab.skywt` and `torrent.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/ollama`: Ollama local model API for `llm.lab.skywt`.
+- `services/open-webui`: Open WebUI chat interface for `ai.lab.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
@@ -85,6 +86,7 @@ Current paths:
 - `/data/homelab/lab/moviepilot/qbittorrent`
 - `/data/homelab/lab/new-api/data`
 - `/data/homelab/lab/ollama`
+- `/data/homelab/lab/open-webui`
 - `/data/homelab/lab/nexus-admin/env`
 - `/data/homelab/lab/rsshub/env`
 - `/data/homelab/lab/rsshub/redis`
@@ -120,6 +122,7 @@ sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
 sudo install -d -m 0775 -o 1000 -g 1000 /data/homelab/lab/moviepilot/{config,core,qbittorrent}
 sudo mkdir -p /data/homelab/lab/new-api/data
 sudo mkdir -p /data/homelab/lab/ollama
+sudo mkdir -p /data/homelab/lab/open-webui
 sudo mkdir -p /data/homelab/lab/nexus-admin/env
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
