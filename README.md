@@ -22,6 +22,7 @@ Configuration for services running on the `lab` host.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
 - `services/ollama`: Ollama local model API for `llm.lab.skywt`.
 - `services/open-webui`: Open WebUI chat interface for `ai.lab.skywt`.
+- `services/pve`: Proxmox VE HTTPS certificate and port-443 configuration for `pve.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.

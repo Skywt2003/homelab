@@ -1,0 +1,16 @@
+[Unit]
+Description=Expose the Proxmox VE Web UI on HTTPS port 443
+Documentation=https://pve.proxmox.com/pve-docs/pveproxy.8.html
+Wants=network-online.target
+After=network-online.target tailscaled.service pveproxy.service proxmox-firewall.service pve-firewall.service
+Requires=pveproxy.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/sbin/nft delete table inet pve_webui_443
+ExecStart=/usr/sbin/nft -f /etc/pve-webui-443.nft
+ExecStop=-/usr/sbin/nft delete table inet pve_webui_443
+
+[Install]
+WantedBy=multi-user.target

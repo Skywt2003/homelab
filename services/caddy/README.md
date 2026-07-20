@@ -6,7 +6,10 @@ Routes are managed by Docker labels on other Compose stacks. For example, the DN
 
 Home Assistant is the exception: it uses host networking for local device discovery, so `home.lab.skywt` is defined in `acme-server.Caddyfile` and proxies to `host.docker.internal:8123`. The Compose `host-gateway` entry makes that name resolve to the `lab` host from inside Caddy.
 
-The same Caddy instance also exposes the internal ACME server at `https://acme.lab.skywt` for selected internal names. It currently allows `*.lab.skywt`, `*.dev.skywt`, and `nas.skywt`; the NAS host runs its own Caddy and obtains the `nas.skywt` certificate from this ACME server.
+The same Caddy instance also exposes the internal ACME server at `https://acme.lab.skywt` for selected internal names. It currently allows `*.lab.skywt`, `*.dev.skywt`, `nas.skywt`, and `pve.skywt`. The NAS host runs its own Caddy and obtains the `nas.skywt` certificate from this ACME server; the PVE host uses its built-in ACME client for `pve.skywt`.
+
+The ACME server issues certificates with a 72-hour lifetime. This accommodates
+PVE's daily renewal job while retaining short-lived internal certificates.
 
 Caddy owns the shared Docker network:
 

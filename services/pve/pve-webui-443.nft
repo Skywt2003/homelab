@@ -1,0 +1,11 @@
+table inet pve_webui_443 {
+    chain prerouting {
+        type nat hook prerouting priority dstnat; policy accept;
+        iifname "tailscale0" ip daddr 100.64.0.4 tcp dport 443 counter redirect to :8006
+    }
+
+    chain output {
+        type nat hook output priority dstnat; policy accept;
+        ip daddr 100.64.0.4 tcp dport 443 counter redirect to :8006
+    }
+}
