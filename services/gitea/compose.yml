@@ -10,6 +10,24 @@ services:
       GITEA__server__ROOT_URL: https://git.lab.skywt/
       GITEA__server__SSH_DOMAIN: git.lab.skywt
       GITEA__server__SSH_PORT: 2222
+      # Gitea does not use http_proxy/https_proxy unless its own proxy support
+      # is enabled. Match GitHub and its asset/API hosts for migrations and
+      # repository mirror updates.
+      GITEA__proxy__PROXY_ENABLED: "true"
+      GITEA__proxy__PROXY_URL: http://proxy:10810
+      GITEA__proxy__PROXY_HOSTS: github.com,*.github.com,githubusercontent.com,*.githubusercontent.com,githubassets.com,*.githubassets.com
+      # Keep the standard variables as well: Git/Git LFS subprocesses inherit
+      # these when Gitea fetches a remote repository.
+      HTTP_PROXY: http://proxy:10810
+      HTTPS_PROXY: http://proxy:10810
+      ALL_PROXY: http://proxy:10810
+      http_proxy: http://proxy:10810
+      https_proxy: http://proxy:10810
+      all_proxy: http://proxy:10810
+      NO_PROXY: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,.lab.skywt,lab-proxy
+      no_proxy: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,.lab.skywt,lab-proxy
+    extra_hosts:
+      - "proxy:100.64.0.7"
     ports:
       - "2222:22"
     networks:
@@ -19,7 +37,9 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/healthz"]
+      # BusyBox wget does not honor NO_PROXY, so explicitly disable proxying
+      # for the container-local health endpoint.
+      test: ["CMD", "wget", "-Y", "off", "-q", "--spider", "http://127.0.0.1:3000/api/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
