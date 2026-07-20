@@ -30,8 +30,11 @@ RUN curl --fail --location --silent --show-error \
     && rm /tmp/scrcpy.tar.gz
 
 COPY entrypoint.sh /usr/local/bin/android-scrcpy-entrypoint
+COPY patch-novnc-direct-touch.py /usr/local/bin/patch-novnc-direct-touch
 
 RUN chmod 0755 /usr/local/bin/android-scrcpy-entrypoint \
+    && python3 /usr/local/bin/patch-novnc-direct-touch \
+    && rm /usr/local/bin/patch-novnc-direct-touch \
     && mkdir -p /var/lib/android/.android \
     && chmod 0700 /var/lib/android/.android
 

@@ -3,7 +3,7 @@
 This stack runs scrcpy against the Android phone passed through from PVE to the
 `lab` VM, and exposes the scrcpy window through TigerVNC and noVNC.
 
-- URL: `https://phone.lab.skywt/vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=true`
+- URL: `https://phone.lab.skywt/vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=false`
 - Short URL: `https://phone.lab.skywt` redirects to the URL above.
 - Android serial: `9c9c03f`
 - PVE VM: `102` (`lab`)
@@ -92,6 +92,13 @@ still be entered manually on the phone when Android requires it.
 The VNC desktop has a fixed portrait geometry and rejects remote resize
 requests. noVNC must use `resize=scale`: `resize=remote` can otherwise move the
 scrcpy window outside a browser-sized desktop and leave only one corner visible.
+
+This image applies a dedicated direct-touch profile to noVNC. A stationary
+single-finger touch is converted to a held primary mouse button after 150 ms,
+so scrcpy receives Android touch-down, hold, and touch-up events instead of
+noVNC's stock right-click gesture. Hold for roughly one second to trigger an
+Android long press. The former touch-hold-as-right-click gesture is therefore
+not available; use `Alt+B` for Android BACK.
 
 ## Validate
 

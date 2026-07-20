@@ -57,12 +57,12 @@ services:
       caddy: phone.lab.skywt
       caddy.tls: internal
       caddy.@root.path: /
-      caddy.redir: "@root /vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=true 302"
+      caddy.redir: "@root /vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=false 302"
       caddy.reverse_proxy: "{{upstreams 6080}}"
       labdash.enable: "true"
       labdash.name: phone
       labdash.appname: Android Remote
-      labdash.url: "https://phone.lab.skywt/vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=true"
+      labdash.url: "https://phone.lab.skywt/vnc.html?autoconnect=true&resize=scale&reconnect=true&show_dot=false"
       labdash.icon: device-mobile
       labdash.group: Personal
       labdash.order: "60"
