@@ -1,0 +1,32 @@
+services:
+  radicale:
+    image: tomsquest/docker-radicale@sha256:b563a587c5f8e0c1f9a52177bced2e9191293de51b5ddeef15a86d2c602ad41b
+    container_name: lab-radicale
+    restart: unless-stopped
+    volumes:
+      - ./config:/config/config:ro
+      - /data/homelab/lab/radicale/data:/data
+    secrets:
+      - source: radicale_users
+        target: users
+    networks:
+      - lab-proxy
+    labels:
+      caddy: vcards.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5232}}"
+      labdash.enable: "true"
+      labdash.name: radicale
+      labdash.appname: Radicale
+      labdash.url: https://vcards.lab.skywt
+      labdash.icon: address-book
+      labdash.group: Services
+      labdash.order: "51"
+
+secrets:
+  radicale_users:
+    file: /run/homelab/secrets/radicale/users
+
+networks:
+  lab-proxy:
+    external: true

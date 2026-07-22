@@ -39,6 +39,7 @@ services=(
   android-scrcpy
   docker-registry
   nexus-admin
+  radicale
   rsshub
   system-monitoring
   immich

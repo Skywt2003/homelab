@@ -98,6 +98,13 @@ materialize_nexus_admin() {
   write_secret nexus-admin /nexus-admin SUPABASE_SECRET_KEY supabase_secret_key
 }
 
+materialize_radicale() {
+  # Compose implements file-backed secrets as bind mounts, so uid/gid/mode
+  # overrides are ignored. The host directory remains root-only (0700), while
+  # the mounted file must be readable by Radicale's UID 2999 in the container.
+  write_secret radicale /radicale USERS users 0444
+}
+
 materialize_rsshub() {
   write_secret rsshub /rsshub TWITTER_AUTH_TOKEN twitter_auth_token
 }
@@ -112,6 +119,7 @@ case "$action" in
   docker-registry) materialize_docker_registry ;;
   immich) materialize_immich ;;
   nexus-admin) materialize_nexus_admin ;;
+  radicale) materialize_radicale ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
   all)
@@ -119,6 +127,7 @@ case "$action" in
     materialize_docker_registry
     materialize_immich
     materialize_nexus_admin
+    materialize_radicale
     materialize_rsshub
     materialize_system_monitoring
     ;;
