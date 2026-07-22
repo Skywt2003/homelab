@@ -1,268 +1,583 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>证书安装指南</title>
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="为你的设备安装 HomeLab CA 根证书，安全访问 *.lab.skywt 服务。">
+    <title>HomeLab CA — 证书安装指南</title>
+    <script>
+      (() => {
+        const saved = localStorage.getItem('ca-theme');
+        const theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <style>
       :root {
-        color-scheme: light dark;
-        --bg: #f7f7f4;
-        --text: #181a1b;
-        --muted: #5f676b;
-        --panel: #ffffff;
-        --line: #d7d9d6;
-        --accent: #176b5f;
-        --accent-text: #ffffff;
-        --code: #eef2ef;
+        color-scheme: light;
+        --background: #fff;
+        --foreground: #0a0a0a;
+        --muted: #666;
+        --muted-2: #8f8f8f;
+        --surface: #fafafa;
+        --surface-hover: #f2f2f2;
+        --border: #eaeaea;
+        --border-strong: #c9c9c9;
+        --inverted: #fff;
+        --grid: rgba(0, 0, 0, 0.055);
+        --focus: #0070f3;
+        --success: #1a7f37;
+        --warning-bg: #fffbeb;
+        --warning-border: #f5d67b;
+        --warning-text: #7a4d00;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 30px rgba(0, 0, 0, .04);
+        --radius: 12px;
+        --font-sans: "Geist Sans", "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-mono: "Geist Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #121416;
-          --text: #eef1ee;
-          --muted: #a9b0ad;
-          --panel: #1b1f21;
-          --line: #343a3d;
-          --accent: #59b9a9;
-          --accent-text: #07110f;
-          --code: #242a2d;
-        }
+      html[data-theme="dark"] {
+        color-scheme: dark;
+        --background: #000;
+        --foreground: #ededed;
+        --muted: #a1a1a1;
+        --muted-2: #777;
+        --surface: #0a0a0a;
+        --surface-hover: #161616;
+        --border: #262626;
+        --border-strong: #484848;
+        --inverted: #000;
+        --grid: rgba(255, 255, 255, 0.07);
+        --focus: #52a8ff;
+        --success: #46a758;
+        --warning-bg: #171207;
+        --warning-border: #4d3a10;
+        --warning-text: #f0c36a;
+        --shadow: 0 1px 2px rgba(255, 255, 255, .02), 0 12px 40px rgba(0, 0, 0, .3);
       }
 
-      * {
-        box-sizing: border-box;
-      }
-
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        line-height: 1.55;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
+      button, select, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+      button, select { font: inherit; }
+      a { color: inherit; }
+      :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 
-      main {
-        width: min(960px, calc(100% - 32px));
+      .skip-link {
+        position: fixed;
+        z-index: 100;
+        top: 12px;
+        left: 12px;
+        transform: translateY(-160%);
+        border-radius: 8px;
+        background: var(--foreground);
+        color: var(--inverted);
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 150ms ease;
+      }
+      .skip-link:focus { transform: translateY(0); }
+
+      .site-header {
+        position: sticky;
+        z-index: 20;
+        top: 0;
+        border-bottom: 1px solid var(--border);
+        background: color-mix(in srgb, var(--background) 88%, transparent);
+        backdrop-filter: blur(12px) saturate(150%);
+      }
+      .nav {
+        width: min(1080px, calc(100% - 40px));
+        min-height: 64px;
         margin: 0 auto;
-        padding: 40px 0 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
       }
-
-      header {
-        margin-bottom: 28px;
-      }
-
-      h1 {
-        margin: 0 0 10px;
-        font-size: clamp(2rem, 5vw, 3.75rem);
-        line-height: 1.05;
-      }
-
-      h2 {
-        margin: 0 0 14px;
-        font-size: 1.35rem;
-      }
-
-      p {
-        margin: 0 0 14px;
-      }
-
-      a {
-        color: var(--accent);
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
         font-weight: 650;
+        letter-spacing: -0.01em;
+        text-decoration: none;
       }
-
-      code {
-        border-radius: 6px;
-        background: var(--code);
-        padding: 0.12rem 0.35rem;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.92em;
+      .brand-mark {
+        width: 0;
+        height: 0;
+        border-right: 9px solid transparent;
+        border-bottom: 16px solid var(--foreground);
+        border-left: 9px solid transparent;
       }
+      .brand-divider { width: 1px; height: 20px; background: var(--border); }
+      .brand-product { color: var(--muted); font-weight: 450; }
+      .nav-controls { display: flex; align-items: center; gap: 8px; }
+      .select-wrap { position: relative; }
+      .language-select {
+        height: 36px;
+        min-width: 108px;
+        appearance: none;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--background);
+        color: var(--foreground);
+        padding: 0 32px 0 12px;
+        font-size: 14px;
+        transition: border-color 150ms ease, background-color 150ms ease;
+      }
+      .select-wrap::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        right: 12px;
+        top: 14px;
+        width: 6px;
+        height: 6px;
+        border-right: 1.5px solid var(--muted);
+        border-bottom: 1.5px solid var(--muted);
+        transform: rotate(45deg);
+      }
+      .icon-button {
+        width: 36px;
+        height: 36px;
+        display: inline-grid;
+        place-items: center;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--background);
+        color: var(--foreground);
+        transition: border-color 150ms ease, background-color 150ms ease, transform 100ms ease;
+      }
+      .icon-button:hover, .language-select:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+      .icon-button:active { transform: scale(.96); }
+      .icon-button svg { width: 16px; height: 16px; }
+      [data-theme="light"] .moon, [data-theme="dark"] .sun { display: none; }
 
-      .lead {
-        max-width: 760px;
+      main { overflow: hidden; }
+      .hero {
+        position: relative;
+        border-bottom: 1px solid var(--border);
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: 40px 40px;
+        mask-image: linear-gradient(to bottom, #000 10%, transparent 95%);
+        pointer-events: none;
+      }
+      .hero-inner {
+        position: relative;
+        width: min(1080px, calc(100% - 40px));
+        min-height: 560px;
+        margin: 0 auto;
+        padding: 106px 0 96px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        align-items: center;
+        gap: 80px;
+      }
+      .eyebrow {
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--background);
+        padding: 6px 10px;
         color: var(--muted);
-        font-size: 1.08rem;
+        font-family: var(--font-mono);
+        font-size: 12px;
       }
-
-      .download {
+      .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 16%, transparent); }
+      h1 {
+        max-width: 710px;
+        margin: 0;
+        font-size: clamp(44px, 6vw, 72px);
+        font-weight: 650;
+        letter-spacing: -.055em;
+        line-height: .98;
+        text-wrap: balance;
+      }
+      .lead {
+        max-width: 650px;
+        margin: 28px 0 0;
+        color: var(--muted);
+        font-size: clamp(17px, 2vw, 20px);
+        line-height: 1.65;
+        text-wrap: pretty;
+      }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+      .button {
+        min-height: 46px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
-        margin-top: 12px;
+        gap: 9px;
+        border: 1px solid var(--foreground);
         border-radius: 8px;
-        background: var(--accent);
-        color: var(--accent-text);
         padding: 0 18px;
+        font-size: 14px;
+        font-weight: 600;
         text-decoration: none;
+        transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 100ms ease;
       }
+      .button-primary { background: var(--foreground); color: var(--inverted); }
+      .button-primary:hover { background: color-mix(in srgb, var(--foreground) 84%, var(--background)); }
+      .button-secondary { border-color: var(--border); background: var(--background); }
+      .button-secondary:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+      .button:active { transform: scale(.985); }
+      .button svg { width: 16px; height: 16px; }
 
-      .notice {
-        margin: 26px 0;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
-        padding: 16px;
+      .certificate-visual {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--background);
+        box-shadow: var(--shadow);
+        padding: 28px;
       }
-
-      .tabs {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
-        overflow: hidden;
+      .certificate-visual::before, .certificate-visual::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 12px -12px -12px 12px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
       }
+      .certificate-visual::after { inset: 24px -24px -24px 24px; z-index: -2; opacity: .65; }
+      .cert-top { display: flex; justify-content: space-between; align-items: flex-start; }
+      .cert-seal { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--foreground); border-radius: 50%; }
+      .cert-seal svg { width: 20px; }
+      .cert-type { color: var(--muted-2); font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+      .cert-title { margin: 54px 0 8px; font-size: 23px; font-weight: 600; letter-spacing: -.035em; }
+      .cert-domain { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+      .cert-lines { display: grid; gap: 10px; margin-top: 48px; }
+      .cert-line { height: 1px; background: var(--border); }
+      .cert-line:nth-child(2) { width: 76%; }
+      .cert-line:nth-child(3) { width: 52%; }
+      .cert-footer { position: absolute; right: 28px; bottom: 26px; left: 28px; display: flex; align-items: center; justify-content: space-between; }
+      .verified { display: flex; align-items: center; gap: 7px; color: var(--success); font-family: var(--font-mono); font-size: 11px; }
+      .fingerprint { color: var(--muted-2); font-family: var(--font-mono); font-size: 10px; }
 
-      .tab-list {
-        display: flex;
-        gap: 0;
-        overflow-x: auto;
-        border-bottom: 1px solid var(--line);
+      .section { width: min(1080px, calc(100% - 40px)); margin: 0 auto; padding: 96px 0; }
+      .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; margin-bottom: 40px; }
+      .section-kicker { margin: 0 0 10px; color: var(--muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+      h2 { margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -.045em; line-height: 1.08; }
+      .section-description { justify-self: end; max-width: 480px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+
+      .security-notice {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        margin-bottom: 24px;
+        border: 1px solid var(--warning-border);
+        border-radius: var(--radius);
+        background: var(--warning-bg);
+        padding: 17px 18px;
+        color: var(--warning-text);
       }
+      .security-notice svg { width: 18px; height: 18px; margin-top: 2px; }
+      .security-notice strong { display: block; margin-bottom: 3px; font-size: 14px; }
+      .security-notice p { margin: 0; font-size: 13px; line-height: 1.6; }
+      code { border: 1px solid var(--border); border-radius: 5px; background: var(--surface); padding: 2px 5px; font-family: var(--font-mono); font-size: .88em; font-variant-numeric: tabular-nums; }
 
+      .tabs { border: 1px solid var(--border); border-radius: var(--radius); background: var(--background); box-shadow: var(--shadow); overflow: hidden; }
+      .tab-list { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); background: var(--surface); }
+      .tab-list::-webkit-scrollbar { display: none; }
       .tab-list button {
-        min-width: 112px;
-        min-height: 48px;
+        position: relative;
+        min-width: 132px;
+        min-height: 54px;
+        flex: 1;
+        cursor: pointer;
         border: 0;
-        border-right: 1px solid var(--line);
+        border-right: 1px solid var(--border);
         background: transparent;
         color: var(--muted);
-        cursor: pointer;
-        font: inherit;
-        font-weight: 700;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 150ms ease, color 150ms ease;
       }
+      .tab-list button:last-child { border-right: 0; }
+      .tab-list button::after { content: ""; position: absolute; right: 16px; bottom: -1px; left: 16px; height: 2px; background: transparent; }
+      .tab-list button:hover { background: var(--surface-hover); color: var(--foreground); }
+      .tab-list button[aria-selected="true"] { background: var(--background); color: var(--foreground); font-weight: 600; }
+      .tab-list button[aria-selected="true"]::after { background: var(--foreground); }
+      .tab-panel { padding: 42px; }
+      .tab-panel[hidden] { display: none; }
+      .platform-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+      .platform-heading h3 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -.03em; }
+      .step-count { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+      .steps { display: grid; grid-template-columns: repeat(2, 1fr); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
+      .steps li { position: relative; min-height: 132px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 22px 22px 22px 58px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+      .step-number { position: absolute; top: 22px; left: 20px; color: var(--foreground); font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
 
-      .tab-list button[aria-selected="true"] {
-        background: var(--accent);
-        color: var(--accent-text);
+      .support { border-top: 1px solid var(--border); background: var(--surface); }
+      .support-inner { width: min(1080px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+      .support h2 { font-size: 28px; }
+      .support p { max-width: 700px; margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      .protocol { border: 1px solid var(--border); border-radius: 999px; padding: 7px 11px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+
+      footer { border-top: 1px solid var(--border); }
+      .footer-inner { width: min(1080px, calc(100% - 40px)); min-height: 84px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: var(--muted); font-size: 12px; }
+      .footer-domain { font-family: var(--font-mono); }
+
+      @media (max-width: 800px) {
+        .hero-inner { min-height: auto; grid-template-columns: 1fr; gap: 64px; padding: 80px 0 84px; }
+        .certificate-visual { width: min(320px, calc(100% - 24px)); justify-self: center; }
+        .section { padding: 72px 0; }
+        .section-heading { grid-template-columns: 1fr; gap: 16px; }
+        .section-description { justify-self: start; }
+        .steps { grid-template-columns: 1fr; }
+        .support-inner { grid-template-columns: 1fr; gap: 24px; }
       }
-
-      .tab-panel {
-        padding: 24px;
+      @media (max-width: 540px) {
+        .nav, .hero-inner, .section, .support-inner, .footer-inner { width: min(100% - 28px, 1080px); }
+        .brand-divider, .brand-product { display: none; }
+        .language-select { min-width: 98px; }
+        h1 { font-size: 43px; }
+        .hero-inner { padding-top: 64px; }
+        .actions { flex-direction: column; }
+        .button { width: 100%; }
+        .tab-panel { padding: 28px 20px 20px; }
+        .steps li { padding-right: 18px; }
+        .footer-inner { min-height: 100px; align-items: flex-start; flex-direction: column; justify-content: center; gap: 6px; }
       }
-
-      .tab-panel[hidden] {
-        display: none;
-      }
-
-      ol {
-        margin: 0;
-        padding-left: 1.4rem;
-      }
-
-      li + li {
-        margin-top: 10px;
-      }
-
-      .footnote {
-        margin-top: 24px;
-        color: var(--muted);
-        font-size: 0.95rem;
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { transition-duration: .01ms !important; }
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <h1>证书安装指南</h1>
-        <p class="lead">
-          安装并信任 HomeLab Caddy Internal CA 根证书后，设备就可以正常访问
-          <code>*.lab.skywt</code> 的 HTTPS 服务。
-        </p>
-        <a class="download" href="/root.crt" download="lab-skywt-caddy-root.crt">下载 root.crt</a>
-      </header>
+    <a class="skip-link" href="#main" data-i18n="skip">跳到主要内容</a>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="#" aria-label="HomeLab CA">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>HomeLab</span>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <span class="brand-product">Certificate Authority</span>
+        </a>
+        <div class="nav-controls">
+          <div class="select-wrap">
+            <label for="language" class="sr-only" hidden data-i18n="languageLabel">语言</label>
+            <select id="language" class="language-select" aria-label="语言">
+              <option value="zh-CN">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="切换到深色模式" title="切换到深色模式">
+            <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+            <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.6 15.8A8.5 8.5 0 0 1 8.2 3.4 8.5 8.5 0 1 0 20.6 15.8Z"/></svg>
+          </button>
+        </div>
+      </nav>
+    </header>
 
-      <section class="notice" aria-label="安全提示">
-        <p>
-          只在你自己控制的设备上安装这张根证书。这里提供的是公开根证书，不是私钥；
-          不要分发 Caddy 数据目录里的 <code>*.key</code> 文件。
-        </p>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div>
+            <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span><span data-i18n="status">CA 服务正常</span></div>
+            <h1 id="hero-title" data-i18n="heroTitle">让每台设备，安全访问 HomeLab。</h1>
+            <p class="lead" data-i18n-html="heroLead">安装并信任 HomeLab Caddy Internal CA 根证书，即可安全访问 <code translate="no">*.lab.skywt</code> 的 HTTPS 服务。</p>
+            <div class="actions">
+              <a class="button button-primary" href="/root.crt" download="lab-skywt-caddy-root.crt">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
+                <span data-i18n="download">下载根证书</span>
+              </a>
+              <a class="button button-secondary" href="#install" data-i18n="viewGuide">查看安装步骤</a>
+            </div>
+          </div>
+
+          <div class="certificate-visual" aria-hidden="true">
+            <div class="cert-top"><div class="cert-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 4.5 6v5.2c0 4.6 3.2 8.8 7.5 9.8 4.3-1 7.5-5.2 7.5-9.8V6L12 3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></div><span class="cert-type">Root Certificate</span></div>
+            <div class="cert-title">HomeLab CA</div>
+            <div class="cert-domain">*.lab.skywt</div>
+            <div class="cert-lines"><span class="cert-line"></span><span class="cert-line"></span><span class="cert-line"></span></div>
+            <div class="cert-footer"><span class="verified"><span class="status-dot"></span>VERIFIED</span><span class="fingerprint">TLS / X.509</span></div>
+          </div>
+        </div>
       </section>
 
-      <section class="tabs">
-        <div class="tab-list" role="tablist" aria-label="操作系统">
-          <button id="tab-ios" role="tab" type="button" aria-selected="true" aria-controls="panel-ios">iOS</button>
-          <button id="tab-macos" role="tab" type="button" aria-selected="false" aria-controls="panel-macos">macOS</button>
-          <button id="tab-linux" role="tab" type="button" aria-selected="false" aria-controls="panel-linux">Linux</button>
-          <button id="tab-windows" role="tab" type="button" aria-selected="false" aria-controls="panel-windows">Windows</button>
-          <button id="tab-android" role="tab" type="button" aria-selected="false" aria-controls="panel-android">Android</button>
+      <section id="install" class="section" aria-labelledby="install-title">
+        <div class="section-heading">
+          <div><p class="section-kicker" data-i18n="installKicker">设备设置</p><h2 id="install-title" data-i18n="installTitle">选择你的操作系统</h2></div>
+          <p class="section-description" data-i18n="installDescription">下载证书后，按照对应平台的步骤完成安装。整个过程通常不到 2 分钟。</p>
         </div>
 
-        <article id="panel-ios" class="tab-panel" role="tabpanel" aria-labelledby="tab-ios">
-          <h2>iOS / iPadOS</h2>
-          <ol>
-            <li>用 Safari 打开本页，下载 <code>root.crt</code>，按提示安装描述文件。</li>
-            <li>打开“设置”，在顶部的“已下载描述文件”中完成安装。</li>
-            <li>进入“设置 -> 通用 -> 关于本机 -> 证书信任设置”。</li>
-            <li>打开对 HomeLab Caddy 根证书的完全信任。</li>
-          </ol>
-        </article>
+        <aside class="security-notice" aria-labelledby="security-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3 4.5 6v5.2c0 4.6 3.2 8.8 7.5 9.8 4.3-1 7.5-5.2 7.5-9.8V6L12 3Z"/><path d="M12 8v5m0 3h.01"/></svg>
+          <div><strong id="security-title" data-i18n="securityTitle">安装前请确认</strong><p data-i18n-html="securityText">只在你自己控制的设备上安装此根证书。这里提供的是公开证书，不是私钥。切勿分发 Caddy 数据目录中的 <code translate="no">*.key</code> 文件。</p></div>
+        </aside>
 
-        <article id="panel-macos" class="tab-panel" role="tabpanel" aria-labelledby="tab-macos" hidden>
-          <h2>macOS</h2>
-          <ol>
-            <li>下载 <code>root.crt</code>，双击导入“钥匙串访问”。</li>
-            <li>把证书放到“系统”钥匙串，或按你的使用范围放到“登录”钥匙串。</li>
-            <li>打开证书详情，在“信任”里将 SSL 设置为“始终信任”。</li>
-            <li>重新打开浏览器，再访问 <code>https://index.lab.skywt</code> 验证。</li>
-          </ol>
-        </article>
+        <div class="tabs">
+          <div class="tab-list" role="tablist" aria-label="操作系统" data-i18n-aria="osLabel">
+            <button id="tab-ios" role="tab" type="button" aria-selected="true" aria-controls="panel-ios" tabindex="0">iOS</button>
+            <button id="tab-macos" role="tab" type="button" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
+            <button id="tab-linux" role="tab" type="button" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
+            <button id="tab-windows" role="tab" type="button" aria-selected="false" aria-controls="panel-windows" tabindex="-1">Windows</button>
+            <button id="tab-android" role="tab" type="button" aria-selected="false" aria-controls="panel-android" tabindex="-1">Android</button>
+          </div>
 
-        <article id="panel-linux" class="tab-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
-          <h2>Linux</h2>
-          <ol>
-            <li>下载 <code>root.crt</code> 到本机。</li>
-            <li>Debian / Ubuntu：复制到 <code>/usr/local/share/ca-certificates/lab-skywt.crt</code>。</li>
-            <li>运行 <code>sudo update-ca-certificates</code>。</li>
-            <li>Fedora / RHEL：复制到 <code>/etc/pki/ca-trust/source/anchors/</code>，然后运行 <code>sudo update-ca-trust</code>。</li>
-          </ol>
-        </article>
+          <article id="panel-ios" class="tab-panel" role="tabpanel" aria-labelledby="tab-ios">
+            <div class="platform-heading"><h3>iOS / iPadOS</h3><span class="step-count" data-i18n="fourSteps">4 个步骤</span></div>
+            <ol class="steps">
+              <li><span class="step-number">01</span><span data-i18n-html="ios1">用 Safari 打开本页，下载 <code translate="no">root.crt</code>。</span></li>
+              <li><span class="step-number">02</span><span data-i18n="ios2">打开“设置”，在顶部的“已下载描述文件”中完成安装。</span></li>
+              <li><span class="step-number">03</span><span data-i18n="ios3">进入“设置 → 通用 → 关于本机 → 证书信任设置”。</span></li>
+              <li><span class="step-number">04</span><span data-i18n="ios4">打开对 HomeLab Caddy 根证书的完全信任。</span></li>
+            </ol>
+          </article>
 
-        <article id="panel-windows" class="tab-panel" role="tabpanel" aria-labelledby="tab-windows" hidden>
-          <h2>Windows</h2>
-          <ol>
-            <li>下载 <code>root.crt</code>。</li>
-            <li>双击证书，选择“安装证书”。</li>
-            <li>选择“本地计算机”，然后放入“受信任的根证书颁发机构”。</li>
-            <li>完成向导后，重新打开浏览器验证 HTTPS 访问。</li>
-          </ol>
-        </article>
+          <article id="panel-macos" class="tab-panel" role="tabpanel" aria-labelledby="tab-macos" hidden>
+            <div class="platform-heading"><h3>macOS</h3><span class="step-count" data-i18n="fourSteps">4 个步骤</span></div>
+            <ol class="steps">
+              <li><span class="step-number">01</span><span data-i18n-html="mac1">下载 <code translate="no">root.crt</code>，双击导入“钥匙串访问”。</span></li>
+              <li><span class="step-number">02</span><span data-i18n="mac2">将证书放入“系统”钥匙串，或按使用范围放入“登录”钥匙串。</span></li>
+              <li><span class="step-number">03</span><span data-i18n="mac3">打开证书详情，在“信任”中将 SSL 设置为“始终信任”。</span></li>
+              <li><span class="step-number">04</span><span data-i18n-html="mac4">重新打开浏览器，访问 <code translate="no">https://index.lab.skywt</code> 验证。</span></li>
+            </ol>
+          </article>
 
-        <article id="panel-android" class="tab-panel" role="tabpanel" aria-labelledby="tab-android" hidden>
-          <h2>Android</h2>
-          <ol>
-            <li>下载 <code>root.crt</code>。</li>
-            <li>在系统设置中搜索“安装证书”或“CA 证书”。</li>
-            <li>选择下载的证书文件，并按提示设置名称和用途。</li>
-            <li>注意：部分 App 不信任用户安装的 CA，但浏览器访问通常可用。</li>
-          </ol>
-        </article>
+          <article id="panel-linux" class="tab-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
+            <div class="platform-heading"><h3>Linux</h3><span class="step-count" data-i18n="fourSteps">4 个步骤</span></div>
+            <ol class="steps">
+              <li><span class="step-number">01</span><span data-i18n-html="linux1">下载 <code translate="no">root.crt</code> 到本机。</span></li>
+              <li><span class="step-number">02</span><span data-i18n-html="linux2">Debian / Ubuntu：复制到 <code translate="no">/usr/local/share/ca-certificates/lab-skywt.crt</code>。</span></li>
+              <li><span class="step-number">03</span><span data-i18n-html="linux3">运行 <code translate="no">sudo update-ca-certificates</code>。</span></li>
+              <li><span class="step-number">04</span><span data-i18n-html="linux4">Fedora / RHEL：复制到 anchors 目录，然后运行 <code translate="no">sudo update-ca-trust</code>。</span></li>
+            </ol>
+          </article>
+
+          <article id="panel-windows" class="tab-panel" role="tabpanel" aria-labelledby="tab-windows" hidden>
+            <div class="platform-heading"><h3>Windows</h3><span class="step-count" data-i18n="fourSteps">4 个步骤</span></div>
+            <ol class="steps">
+              <li><span class="step-number">01</span><span data-i18n-html="win1">下载 <code translate="no">root.crt</code>。</span></li>
+              <li><span class="step-number">02</span><span data-i18n="win2">双击证书，选择“安装证书”。</span></li>
+              <li><span class="step-number">03</span><span data-i18n="win3">选择“本地计算机”，放入“受信任的根证书颁发机构”。</span></li>
+              <li><span class="step-number">04</span><span data-i18n="win4">完成向导后，重新打开浏览器验证 HTTPS 访问。</span></li>
+            </ol>
+          </article>
+
+          <article id="panel-android" class="tab-panel" role="tabpanel" aria-labelledby="tab-android" hidden>
+            <div class="platform-heading"><h3>Android</h3><span class="step-count" data-i18n="fourSteps">4 个步骤</span></div>
+            <ol class="steps">
+              <li><span class="step-number">01</span><span data-i18n-html="android1">下载 <code translate="no">root.crt</code>。</span></li>
+              <li><span class="step-number">02</span><span data-i18n="android2">在系统设置中搜索“安装证书”或“CA 证书”。</span></li>
+              <li><span class="step-number">03</span><span data-i18n="android3">选择下载的证书文件，并按提示设置名称和用途。</span></li>
+              <li><span class="step-number">04</span><span data-i18n="android4">部分 App 不信任用户安装的 CA，但浏览器访问通常可用。</span></li>
+            </ol>
+          </article>
+        </div>
       </section>
 
-      <p class="footnote">
-        如果安装后仍然提示证书不可信，请确认访问地址是 <code>https://</code>，
-        并重启浏览器或相关 App。
-      </p>
+      <section class="support" aria-labelledby="support-title">
+        <div class="support-inner"><div><h2 id="support-title" data-i18n="supportTitle">仍然显示证书不可信？</h2><p data-i18n-html="supportText">确认访问地址以 <code translate="no">https://</code> 开头，然后完全退出并重新打开浏览器。部分设备可能还需要重启。</p></div><span class="protocol">HTTPS · TLS 1.3</span></div>
+      </section>
     </main>
 
+    <footer><div class="footer-inner"><span data-i18n="footer">仅供 HomeLab 内部设备使用</span><span class="footer-domain">ca.lab.skywt</span></div></footer>
+
     <script>
-      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
-      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+      const translations = {
+        'zh-CN': {
+          title: 'HomeLab CA — 证书安装指南', description: '为你的设备安装 HomeLab CA 根证书，安全访问 *.lab.skywt 服务。', skip: '跳到主要内容', languageLabel: '语言', themeLight: '切换到浅色模式', themeDark: '切换到深色模式', status: 'CA 服务正常', heroTitle: '让每台设备，安全访问 HomeLab。', heroLead: '安装并信任 HomeLab Caddy Internal CA 根证书，即可安全访问 <code translate="no">*.lab.skywt</code> 的 HTTPS 服务。', download: '下载根证书', viewGuide: '查看安装步骤', installKicker: '设备设置', installTitle: '选择你的操作系统', installDescription: '下载证书后，按照对应平台的步骤完成安装。整个过程通常不到 2 分钟。', securityTitle: '安装前请确认', securityText: '只在你自己控制的设备上安装此根证书。这里提供的是公开证书，不是私钥。切勿分发 Caddy 数据目录中的 <code translate="no">*.key</code> 文件。', osLabel: '操作系统', fourSteps: '4 个步骤', ios1: '用 Safari 打开本页，下载 <code translate="no">root.crt</code>。', ios2: '打开“设置”，在顶部的“已下载描述文件”中完成安装。', ios3: '进入“设置 → 通用 → 关于本机 → 证书信任设置”。', ios4: '打开对 HomeLab Caddy 根证书的完全信任。', mac1: '下载 <code translate="no">root.crt</code>，双击导入“钥匙串访问”。', mac2: '将证书放入“系统”钥匙串，或按使用范围放入“登录”钥匙串。', mac3: '打开证书详情，在“信任”中将 SSL 设置为“始终信任”。', mac4: '重新打开浏览器，访问 <code translate="no">https://index.lab.skywt</code> 验证。', linux1: '下载 <code translate="no">root.crt</code> 到本机。', linux2: 'Debian / Ubuntu：复制到 <code translate="no">/usr/local/share/ca-certificates/lab-skywt.crt</code>。', linux3: '运行 <code translate="no">sudo update-ca-certificates</code>。', linux4: 'Fedora / RHEL：复制到 anchors 目录，然后运行 <code translate="no">sudo update-ca-trust</code>。', win1: '下载 <code translate="no">root.crt</code>。', win2: '双击证书，选择“安装证书”。', win3: '选择“本地计算机”，放入“受信任的根证书颁发机构”。', win4: '完成向导后，重新打开浏览器验证 HTTPS 访问。', android1: '下载 <code translate="no">root.crt</code>。', android2: '在系统设置中搜索“安装证书”或“CA 证书”。', android3: '选择下载的证书文件，并按提示设置名称和用途。', android4: '部分 App 不信任用户安装的 CA，但浏览器访问通常可用。', supportTitle: '仍然显示证书不可信？', supportText: '确认访问地址以 <code translate="no">https://</code> 开头，然后完全退出并重新打开浏览器。部分设备可能还需要重启。', footer: '仅供 HomeLab 内部设备使用'
+        },
+        en: {
+          title: 'HomeLab CA — Certificate Setup', description: 'Install the HomeLab CA root certificate to securely access *.lab.skywt services.', skip: 'Skip to main content', languageLabel: 'Language', themeLight: 'Switch to light mode', themeDark: 'Switch to dark mode', status: 'CA service operational', heroTitle: 'Secure access to your HomeLab, everywhere.', heroLead: 'Install and trust the HomeLab Caddy Internal CA root certificate to securely access HTTPS services at <code translate="no">*.lab.skywt</code>.', download: 'Download Root Certificate', viewGuide: 'View Setup Guide', installKicker: 'Device setup', installTitle: 'Choose your operating system', installDescription: 'Download the certificate, then follow the steps for your platform. Setup usually takes less than 2 minutes.', securityTitle: 'Before you install', securityText: 'Only install this root certificate on devices you control. This is a public certificate, not a private key. Never distribute <code translate="no">*.key</code> files from the Caddy data directory.', osLabel: 'Operating systems', fourSteps: '4 steps', ios1: 'Open this page in Safari and download <code translate="no">root.crt</code>.', ios2: 'Open Settings and install the profile under “Profile Downloaded”.', ios3: 'Go to Settings → General → About → Certificate Trust Settings.', ios4: 'Enable full trust for the HomeLab Caddy root certificate.', mac1: 'Download <code translate="no">root.crt</code> and double-click it to open Keychain Access.', mac2: 'Add it to the System keychain, or Login keychain for your user only.', mac3: 'Open the certificate, expand Trust, and set Secure Sockets Layer to Always Trust.', mac4: 'Restart your browser and visit <code translate="no">https://index.lab.skywt</code> to verify.', linux1: 'Download <code translate="no">root.crt</code> to your device.', linux2: 'On Debian / Ubuntu, copy it to <code translate="no">/usr/local/share/ca-certificates/lab-skywt.crt</code>.', linux3: 'Run <code translate="no">sudo update-ca-certificates</code>.', linux4: 'On Fedora / RHEL, copy it to the anchors directory, then run <code translate="no">sudo update-ca-trust</code>.', win1: 'Download <code translate="no">root.crt</code>.', win2: 'Double-click the certificate, then choose “Install Certificate”.', win3: 'Select “Local Machine” and place it in “Trusted Root Certification Authorities”.', win4: 'Finish the wizard, then restart your browser to verify HTTPS access.', android1: 'Download <code translate="no">root.crt</code>.', android2: 'Search system settings for “Install certificate” or “CA certificate”.', android3: 'Choose the downloaded certificate, then set its name and purpose.', android4: 'Some apps ignore user-installed CAs, but browser access usually works.', supportTitle: 'Still seeing a certificate warning?', supportText: 'Confirm the address starts with <code translate="no">https://</code>, then fully quit and reopen your browser. Some devices may also require a restart.', footer: 'For trusted HomeLab devices only'
+        }
+      };
 
-      function selectTab(tab) {
-        tabs.forEach((item) => {
-          item.setAttribute('aria-selected', String(item === tab));
-        });
+      const languageSelect = document.querySelector('#language');
+      const themeToggle = document.querySelector('#theme-toggle');
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = [...document.querySelectorAll('[role="tabpanel"]')];
 
-        panels.forEach((panel) => {
-          panel.hidden = panel.id !== tab.getAttribute('aria-controls');
-        });
+      function setLanguage(locale) {
+        const language = translations[locale] ? locale : 'en';
+        const copy = translations[language];
+        document.documentElement.lang = language;
+        document.title = copy.title;
+        document.querySelector('meta[name="description"]').content = copy.description;
+        document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = copy[node.dataset.i18n]; });
+        document.querySelectorAll('[data-i18n-html]').forEach((node) => { node.innerHTML = copy[node.dataset.i18nHtml]; });
+        document.querySelectorAll('[data-i18n-aria]').forEach((node) => { node.setAttribute('aria-label', copy[node.dataset.i18nAria]); });
+        languageSelect.value = language;
+        languageSelect.setAttribute('aria-label', copy.languageLabel);
+        localStorage.setItem('ca-language', language);
+        updateThemeLabel();
       }
 
-      tabs.forEach((tab) => {
+      function updateThemeLabel() {
+        const language = languageSelect.value || 'zh-CN';
+        const isDark = document.documentElement.dataset.theme === 'dark';
+        const label = translations[language][isDark ? 'themeLight' : 'themeDark'];
+        themeToggle.setAttribute('aria-label', label);
+        themeToggle.title = label;
+      }
+
+      function setTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#000000' : '#ffffff';
+        localStorage.setItem('ca-theme', theme);
+        updateThemeLabel();
+      }
+
+      function selectTab(tab, moveFocus = false) {
+        tabs.forEach((item) => {
+          const active = item === tab;
+          item.setAttribute('aria-selected', String(active));
+          item.tabIndex = active ? 0 : -1;
+        });
+        panels.forEach((panel) => { panel.hidden = panel.id !== tab.getAttribute('aria-controls'); });
+        history.replaceState(null, '', `#${tab.id.replace('tab-', '')}`);
+        if (moveFocus) tab.focus();
+      }
+
+      languageSelect.addEventListener('change', (event) => setLanguage(event.target.value));
+      themeToggle.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+      tabs.forEach((tab, index) => {
         tab.addEventListener('click', () => selectTab(tab));
+        tab.addEventListener('keydown', (event) => {
+          let next = null;
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = tabs[(index + 1) % tabs.length];
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = tabs[(index - 1 + tabs.length) % tabs.length];
+          if (event.key === 'Home') next = tabs[0];
+          if (event.key === 'End') next = tabs[tabs.length - 1];
+          if (next) { event.preventDefault(); selectTab(next, true); }
+        });
       });
+
+      const savedLanguage = localStorage.getItem('ca-language');
+      const browserLanguage = navigator.languages?.some((item) => item.toLowerCase().startsWith('zh')) ? 'zh-CN' : 'en';
+      setLanguage(savedLanguage || browserLanguage);
+      setTheme(document.documentElement.dataset.theme);
+      const hashTab = tabs.find((tab) => `#${tab.id.replace('tab-', '')}` === location.hash);
+      if (hashTab) selectTab(hashTab);
     </script>
   </body>
 </html>
