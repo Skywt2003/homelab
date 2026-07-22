@@ -160,6 +160,15 @@ filtering:
     - domain: pve.skywt
       answer: 100.64.0.4
       enabled: true
+    - domain: gz.skywt
+      answer: 101.33.238.184
+      enabled: true
+    - domain: la.skywt
+      answer: 45.32.88.139
+      enabled: true
+    - domain: sg.skywt
+      answer: 45.32.120.65
+      enabled: true
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576
