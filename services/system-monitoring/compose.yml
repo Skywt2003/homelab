@@ -104,6 +104,8 @@ services:
       METRIC_PREFIX: mihomo
       METRICS_ENABLE_TOTAL_TRAFFIC: "true"
       METRICS_ENABLE_NODE_AGGREGATION: "true"
+      # Prometheus label -> Mihomo organizational group. Membership is read from the API.
+      METRICS_NODE_GROUPS: airport=AIRPORT,self_hosted=SELF-HOSTED
       # Destination labels can become high-cardinality; node aggregation remains enabled.
       METRICS_ENABLE_DESTINATION_AGGREGATION: "false"
     secrets:

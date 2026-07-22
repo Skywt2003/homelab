@@ -17,6 +17,8 @@ type MihomoCollector struct {
 	prefix string
 	mutex  sync.RWMutex
 
+	nodeGroupMappings []NodeGroupMapping
+
 	// 配置选项
 	enableTotalTraffic           bool
 	enableNodeAggregation        bool
@@ -48,16 +50,26 @@ type MihomoCollector struct {
 	cachedConnections    *ConnectionsResponse
 	cachedProxyLatencies map[string]int
 	cachedProxies        *ProxiesResponse
+	cachedNodeGroups     map[string]string
+}
+
+// NodeGroupMapping maps a stable Prometheus label value to a Mihomo proxy
+// group.  Membership is read from Mihomo's /proxies API, so monitoring follows
+// the gateway configuration instead of duplicating every node name here.
+type NodeGroupMapping struct {
+	Label      string
+	ProxyGroup string
 }
 
 // NewMihomoCollector 创建并初始化一个 Collector
-func NewMihomoCollector(client *MihomoClient, prefix string, enableTotalTraffic, enableNodeAgg, enableDestAgg bool) *MihomoCollector {
+func NewMihomoCollector(client *MihomoClient, prefix string, enableTotalTraffic, enableNodeAgg, enableDestAgg bool, nodeGroupMappings []NodeGroupMapping) *MihomoCollector {
 	fqName := func(name string) string {
 		return prometheus.BuildFQName(prefix, "", name)
 	}
 	return &MihomoCollector{
 		client:                       client,
 		prefix:                       prefix,
+		nodeGroupMappings:            nodeGroupMappings,
 		enableTotalTraffic:           enableTotalTraffic,
 		enableNodeAggregation:        enableNodeAgg,
 		enableDestinationAggregation: enableDestAgg,
@@ -89,12 +101,12 @@ func NewMihomoCollector(client *MihomoClient, prefix string, enableTotalTraffic,
 		proxyLatency: prometheus.NewDesc(
 			fqName("proxy_latency_ms"),
 			"Latency of a specific proxy in milliseconds.",
-			[]string{"proxy_name"}, nil,
+			[]string{"proxy_name", "node_group"}, nil,
 		),
 		proxyAvailable: prometheus.NewDesc(
 			fqName("proxy_available"),
 			"Availability of a specific proxy (1 for available, 0 for unavailable).",
-			[]string{"proxy_name"}, nil,
+			[]string{"proxy_name", "node_group"}, nil,
 		),
 		proxyGroupSelected: prometheus.NewDesc(
 			fqName("proxy_group_selected"),
@@ -114,12 +126,12 @@ func NewMihomoCollector(client *MihomoClient, prefix string, enableTotalTraffic,
 		connectionUploadByNode: prometheus.NewDesc(
 			fqName("connection_upload_bytes_by_node"),
 			"Total uploaded bytes aggregated by outbound node (low cardinality).",
-			[]string{"outbound_node"}, nil,
+			[]string{"outbound_node", "node_group"}, nil,
 		),
 		connectionDownloadByNode: prometheus.NewDesc(
 			fqName("connection_download_bytes_by_node"),
 			"Total downloaded bytes aggregated by outbound node (low cardinality).",
-			[]string{"outbound_node"}, nil,
+			[]string{"outbound_node", "node_group"}, nil,
 		),
 		connectionUploadByDestination: prometheus.NewDesc(
 			fqName("connection_upload_bytes_by_destination"),
@@ -132,7 +144,45 @@ func NewMihomoCollector(client *MihomoClient, prefix string, enableTotalTraffic,
 			[]string{"destination", "outbound_node"}, nil,
 		),
 		cachedProxyLatencies: make(map[string]int),
+		cachedNodeGroups:     make(map[string]string),
 	}
+}
+
+func (c *MihomoCollector) updateNodeGroupsLocked(proxies *ProxiesResponse) {
+	groups := make(map[string]string)
+	if proxies != nil {
+		for _, mapping := range c.nodeGroupMappings {
+			proxyGroup, ok := proxies.Proxies[mapping.ProxyGroup]
+			if !ok || !isProxyGroupType(proxyGroup.Type) {
+				continue
+			}
+			for _, proxyName := range proxyGroup.All {
+				if isExcludedMonitoringProxy(proxyName) {
+					continue
+				}
+				// The first configured mapping wins if groups accidentally overlap.
+				if _, exists := groups[proxyName]; !exists {
+					groups[proxyName] = mapping.Label
+				}
+			}
+		}
+	}
+	c.cachedNodeGroups = groups
+}
+
+func isExcludedMonitoringProxy(proxyName string) bool {
+	switch proxyName {
+	case "PASS", "PASS-RULE", "REJECT-DROP", "COMPATIBLE":
+		return true
+	}
+	return strings.HasPrefix(proxyName, "Traffic:") || strings.HasPrefix(proxyName, "Expire:")
+}
+
+func (c *MihomoCollector) nodeGroupLocked(proxyName string) string {
+	if group, ok := c.cachedNodeGroups[proxyName]; ok {
+		return group
+	}
+	return "unclassified"
 }
 
 // getActualOutboundNode 获取实际的出站节点名称
@@ -330,8 +380,9 @@ func (c *MihomoCollector) Collect(ch chan<- prometheus.Metric) {
 
 		if c.enableNodeAggregation {
 			for node, traffic := range aggregatedByNode {
-				ch <- prometheus.MustNewConstMetric(c.connectionUploadByNode, prometheus.GaugeValue, float64(traffic.upload), node)
-				ch <- prometheus.MustNewConstMetric(c.connectionDownloadByNode, prometheus.GaugeValue, float64(traffic.download), node)
+				nodeGroup := c.nodeGroupLocked(node)
+				ch <- prometheus.MustNewConstMetric(c.connectionUploadByNode, prometheus.GaugeValue, float64(traffic.upload), node, nodeGroup)
+				ch <- prometheus.MustNewConstMetric(c.connectionDownloadByNode, prometheus.GaugeValue, float64(traffic.download), node, nodeGroup)
 			}
 		}
 
@@ -360,8 +411,9 @@ func (c *MihomoCollector) Collect(ch chan<- prometheus.Metric) {
 			if delay <= 0 { // 延迟为0或负数通常表示超时或不可用
 				available = 0.0
 			}
-			ch <- prometheus.MustNewConstMetric(c.proxyLatency, prometheus.GaugeValue, float64(delay), name)
-			ch <- prometheus.MustNewConstMetric(c.proxyAvailable, prometheus.GaugeValue, available, name)
+			nodeGroup := c.nodeGroupLocked(name)
+			ch <- prometheus.MustNewConstMetric(c.proxyLatency, prometheus.GaugeValue, float64(delay), name, nodeGroup)
+			ch <- prometheus.MustNewConstMetric(c.proxyAvailable, prometheus.GaugeValue, available, name, nodeGroup)
 		}
 	}
 }
@@ -409,6 +461,7 @@ func (c *MihomoCollector) updateFastMetrics(ctx context.Context) {
 		}
 		c.mutex.Lock()
 		c.cachedProxies = proxies
+		c.updateNodeGroupsLocked(proxies)
 		c.mutex.Unlock()
 	}()
 	wg.Wait()
@@ -427,12 +480,20 @@ func (c *MihomoCollector) updateSlowMetrics(ctx context.Context) {
 	if err != nil {
 		log.Printf("Error getting proxies: %v", err)
 	} else {
+		c.mutex.Lock()
+		c.cachedProxies = proxies
+		c.updateNodeGroupsLocked(proxies)
+		c.mutex.Unlock()
+
 		var latencyWg sync.WaitGroup
 		var latencyMutex sync.Mutex
 
 		for name, p := range proxies.Proxies {
 			// 只测试可用的代理节点，排除选择器、DIRECT等
 			if p.Type == "Selector" || p.Type == "URLTest" || p.Type == "Fallback" || p.Type == "LoadBalance" || p.Type == "Direct" || p.Type == "Reject" {
+				continue
+			}
+			if isExcludedMonitoringProxy(name) {
 				continue
 			}
 			latencyWg.Add(1)

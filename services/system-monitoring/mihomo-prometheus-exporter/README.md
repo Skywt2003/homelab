@@ -72,6 +72,7 @@ Exporter，用于从 [Mihomo](https://github.com/MetaCubeX/mihomo) 中导出详�
 | `metrics.enable-total-traffic` | `METRICS_ENABLE_TOTAL_TRAFFIC` | `true` | 启用精准的累计流量指标（从 Mihomo API 直接读取）。        |
 | `metrics.enable-node-aggregation` | `METRICS_ENABLE_NODE_AGGREGATION` | `true` | 启用按出站节点聚合的连接指标（低基数指标）。                 |
 | `metrics.enable-destination-aggregation` | `METRICS_ENABLE_DESTINATION_AGGREGATION` | `true` | 启用按目标聚合的连接指标（低基数指标）。                   |
+| `metrics.node-groups` | `METRICS_NODE_GROUPS` | `""` | Prometheus 分组标签到 Mihomo 组织分组的映射，例如 `airport=AIRPORT,self_hosted=SELF-HOSTED`。 |
 
 ### Docker运行
 
@@ -140,8 +141,8 @@ scrape_configs:
 
 | 指标名称 | 类型 | 标签 | 基数 | 描述 |
 |---------|------|------|------|------|
-| `mihomo_connection_upload_bytes_by_node` | Gauge | `outbound_node` | 节点数 | 按出站节点聚合的上传字节数。 |
-| `mihomo_connection_download_bytes_by_node` | Gauge | `outbound_node` | 节点数 | 按出站节点聚合的下载字节数。 |
+| `mihomo_connection_upload_bytes_by_node` | Gauge | `outbound_node`, `node_group` | 节点数 | 按出站节点及组织分组聚合的上传字节数。 |
+| `mihomo_connection_download_bytes_by_node` | Gauge | `outbound_node`, `node_group` | 节点数 | 按出站节点及组织分组聚合的下载字节数。 |
 | `mihomo_connection_upload_bytes_by_destination` | Gauge | `destination`, `outbound_node` | 目标数×节点数 | 按目标聚合的上传字节数。 |
 | `mihomo_connection_download_bytes_by_destination` | Gauge | `destination`, `outbound_node` | 目标数×节点数 | 按目标聚合的下载字节数。 |
 
@@ -154,8 +155,8 @@ scrape_configs:
 | `mihomo_connections_active_total` | Gauge | 无 | 1 | 当前活跃连接的总数。 |
 | `mihomo_connection_upload_bytes` | Gauge | `source_host`, `destination`, `outbound_node` | 高 | 单个连接累计上传的字节数。 |
 | `mihomo_connection_download_bytes` | Gauge | `source_host`, `destination`, `outbound_node` | 高 | 单个连接累计下载的字节数。 |
-| `mihomo_proxy_latency_ms` | Gauge | `proxy_name` | 节点数 | 代理节点的延迟（毫秒），-1 表示测试失败。 |
-| `mihomo_proxy_available` | Gauge | `proxy_name` | 节点数 | 代理节点的可用性（1=可用，0=不可用）。 |
+| `mihomo_proxy_latency_ms` | Gauge | `proxy_name`, `node_group` | 节点数 | 代理节点的延迟（毫秒），-1 表示测试失败。 |
+| `mihomo_proxy_available` | Gauge | `proxy_name`, `node_group` | 节点数 | 代理节点的可用性（1=可用，0=不可用）。 |
 
 **基数说明**：
 - **精准流量指标**：固定 2 个时间序列（推荐用于计算速率）

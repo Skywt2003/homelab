@@ -9,10 +9,15 @@ route:
   routes:
     - receiver: apprise-bark
       matchers:
-        - alertname=~"MihomoAvailable.*TooLow"
+        - alertname="MihomoNodeGroupAvailabilityTooLow"
+      group_by:
+        - alertname
+        - node_group
       group_wait: 30s
       group_interval: 5m
-      repeat_interval: 4h
+      # Avoid repeated notifications during one incident. A weekly reminder is
+      # retained for a pathological long-running outage.
+      repeat_interval: 168h
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 4h
@@ -22,4 +27,5 @@ receivers:
   - name: apprise-bark
     webhook_configs:
       - send_resolved: true
-        url: 'http://lab-apprise-api:8000/notify/apprise?:commonLabels.alertname=title&:commonAnnotations.description=body&:type=warning&:format=text'
+        # The title becomes "firing" or "resolved"; the body keeps group details.
+        url: 'http://lab-apprise-api:8000/notify/apprise?:status=title&:commonAnnotations.description=body&:type=warning&:format=text'

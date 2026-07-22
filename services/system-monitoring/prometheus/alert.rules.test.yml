@@ -1,0 +1,41 @@
+rule_files:
+  - alert.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: airport group stays below the availability threshold
+    interval: 1m
+    input_series:
+      - series: 'mihomo_node_group_available_ratio{node_group="airport"}'
+        values: '0.1x12'
+      - series: 'mihomo_node_group_available_ratio{node_group="self_hosted"}'
+        values: '1x12'
+    alert_rule_test:
+      - eval_time: 11m
+        alertname: MihomoNodeGroupAvailabilityTooLow
+        exp_alerts:
+          - exp_labels:
+              node_group: airport
+              severity: warning
+            exp_annotations:
+              summary: 'Mihomo node group airport availability is low'
+              description: 'Node group airport availability is 10% (threshold: 20%) for more than 10 minutes.'
+
+  - name: self-hosted group stays below the availability threshold
+    interval: 1m
+    input_series:
+      - series: 'mihomo_node_group_available_ratio{node_group="airport"}'
+        values: '1x12'
+      - series: 'mihomo_node_group_available_ratio{node_group="self_hosted"}'
+        values: '0x12'
+    alert_rule_test:
+      - eval_time: 11m
+        alertname: MihomoNodeGroupAvailabilityTooLow
+        exp_alerts:
+          - exp_labels:
+              node_group: self_hosted
+              severity: warning
+            exp_annotations:
+              summary: 'Mihomo node group self_hosted availability is low'
+              description: 'Node group self_hosted availability is 0% (threshold: 20%) for more than 10 minutes.'

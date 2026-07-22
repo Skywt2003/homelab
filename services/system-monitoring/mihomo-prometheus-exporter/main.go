@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,29 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
+
+func parseNodeGroupMappings(raw string) ([]NodeGroupMapping, error) {
+	if strings.TrimSpace(raw) == "" {
+		return nil, nil
+	}
+
+	var mappings []NodeGroupMapping
+	seenLabels := make(map[string]struct{})
+	for _, item := range strings.Split(raw, ",") {
+		parts := strings.SplitN(strings.TrimSpace(item), "=", 2)
+		if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
+			return nil, fmt.Errorf("invalid node group mapping %q; expected label=proxy-group", item)
+		}
+		label := strings.TrimSpace(parts[0])
+		proxyGroup := strings.TrimSpace(parts[1])
+		if _, exists := seenLabels[label]; exists {
+			return nil, fmt.Errorf("duplicate node group label %q", label)
+		}
+		seenLabels[label] = struct{}{}
+		mappings = append(mappings, NodeGroupMapping{Label: label, ProxyGroup: proxyGroup})
+	}
+	return mappings, nil
+}
 
 func loadFlagsFromEnv() {
 	replacer := strings.NewReplacer(".", "_", "-", "_")
@@ -41,6 +65,7 @@ func main() {
 	enableTotalTraffic := flag.Bool("metrics.enable-total-traffic", true, "Enable accurate total traffic metrics from Mihomo API.")
 	enableNodeAggregation := flag.Bool("metrics.enable-node-aggregation", true, "Enable connection metrics aggregated by outbound node.")
 	enableDestinationAggregation := flag.Bool("metrics.enable-destination-aggregation", true, "Enable connection metrics aggregated by destination.")
+	nodeGroups := flag.String("metrics.node-groups", "", "Comma-separated node-group mappings in label=proxy-group form.")
 	flag.Parse()
 
 	// 从环境变量加载配置，环境变量会覆盖命令行参数
@@ -55,9 +80,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create Mihomo client: %v", err)
 	}
+	nodeGroupMappings, err := parseNodeGroupMappings(*nodeGroups)
+	if err != nil {
+		log.Fatalf("Failed to parse node group mappings: %v", err)
+	}
 
 	// 创建并注册 Collector
-	collector := NewMihomoCollector(client, *metricPrefix, *enableTotalTraffic, *enableNodeAggregation, *enableDestinationAggregation)
+	collector := NewMihomoCollector(client, *metricPrefix, *enableTotalTraffic, *enableNodeAggregation, *enableDestinationAggregation, nodeGroupMappings)
 	prometheus.MustRegister(collector)
 
 	// 创建一个带取消功能的 context 用于优雅关闭

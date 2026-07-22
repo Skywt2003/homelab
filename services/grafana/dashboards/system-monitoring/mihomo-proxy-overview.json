@@ -8,7 +8,7 @@
   ],
   "timezone": "browser",
   "schemaVersion": 41,
-  "version": 5,
+  "version": 7,
   "refresh": "10s",
   "time": {
     "from": "now-6h",
@@ -318,7 +318,7 @@
     {
       "id": 6,
       "type": "stat",
-      "title": "Unavailable proxies",
+      "title": "Unavailable grouped nodes",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
@@ -331,7 +331,7 @@
       },
       "targets": [
         {
-          "expr": "count(mihomo_proxy_available == 0)",
+          "expr": "sum(mihomo_node_group_total_nodes - mihomo_node_group_available_nodes)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -373,7 +373,8 @@
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto"
-      }
+      },
+      "description": "Unavailable nodes across the AIRPORT and SELF-HOSTED monitoring groups."
     },
     {
       "id": 7,
@@ -816,7 +817,7 @@
     {
       "id": 14,
       "type": "table",
-      "title": "All proxy availability and latency",
+      "title": "Airport Nodes: Current Availability and Latency",
       "datasource": {
         "type": "prometheus",
         "uid": "system-monitoring"
@@ -824,17 +825,17 @@
       "gridPos": {
         "x": 0,
         "y": 41,
-        "w": 24,
+        "w": 12,
         "h": 8
       },
       "targets": [
         {
-          "expr": "mihomo_proxy_available",
+          "expr": "mihomo_proxy_available{node_group=\"airport\"}",
           "legendFormat": "available",
           "refId": "A"
         },
         {
-          "expr": "mihomo_proxy_latency_ms",
+          "expr": "mihomo_proxy_latency_ms{node_group=\"airport\"}",
           "legendFormat": "latency",
           "refId": "B"
         }
@@ -875,7 +876,861 @@
           }
         }
       ],
-      "description": "Current availability and latency for all probed Mihomo proxy nodes."
+      "description": "Current availability and latest active probe latency for airport nodes."
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Self-hosted Nodes: Current Availability and Latency",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 41,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_available{node_group=\"self_hosted\"}",
+          "legendFormat": "available",
+          "refId": "A"
+        },
+        {
+          "expr": "mihomo_proxy_latency_ms{node_group=\"self_hosted\"}",
+          "legendFormat": "latency",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        }
+      ],
+      "description": "Current availability and latest active probe latency for self-hosted nodes."
+    },
+    {
+      "id": 29,
+      "type": "row",
+      "title": "Node Group Health: Airport vs Self-hosted",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 49,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Airport Node Availability",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "mihomo_node_group_available_ratio{node_group=\"airport\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.8
+              },
+              {
+                "color": "green",
+                "value": 0.95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Currently available airport nodes divided by total airport nodes."
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "Self-hosted Node Availability",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 50,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "mihomo_node_group_available_ratio{node_group=\"self_hosted\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.8
+              },
+              {
+                "color": "green",
+                "value": 0.95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Currently available self-hosted nodes divided by total self-hosted nodes."
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "Unavailable Airport Nodes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 50,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "mihomo_node_group_total_nodes{node_group=\"airport\"} - mihomo_node_group_available_nodes{node_group=\"airport\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Current number of unavailable airport nodes."
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "Unavailable Self-hosted Nodes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 50,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "mihomo_node_group_total_nodes{node_group=\"self_hosted\"} - mihomo_node_group_available_nodes{node_group=\"self_hosted\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "description": "Current number of unavailable self-hosted nodes."
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Airport Node Latency",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 54,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_latency_ms{node_group=\"airport\"} >= 0",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Active probe latency for airport nodes; failed probes are excluded instead of being shown as 0 ms."
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Self-hosted Node Latency",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 54,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_latency_ms{node_group=\"self_hosted\"} >= 0",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Active probe latency for self-hosted nodes; failed probes are excluded instead of being shown as 0 ms."
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Airport Node Error Rate (5m)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 62,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_probe_failure_ratio_5m{node_group=\"airport\"}",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Rolling 5-minute active probe failure ratio for each airport node."
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Self-hosted Node Error Rate (5m)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 62,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_probe_failure_ratio_5m{node_group=\"self_hosted\"}",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Rolling 5-minute active probe failure ratio for each self-hosted node."
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Airport Node Latency Jitter (5m)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 70,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_latency_jitter_ms_5m{node_group=\"airport\"}",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 300
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Five-minute latency standard deviation for airport nodes."
+    },
+    {
+      "id": 25,
+      "type": "timeseries",
+      "title": "Self-hosted Node Latency Jitter (5m)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 70,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_proxy_latency_jitter_ms_5m{node_group=\"self_hosted\"}",
+          "legendFormat": "{{proxy_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 300
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Five-minute latency standard deviation for self-hosted nodes."
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "Airport Node Traffic",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 78,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(clamp_min(rate(mihomo_connection_download_bytes_by_node{node_group=\"airport\"}[1m]), 0))",
+          "legendFormat": "download",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(clamp_min(rate(mihomo_connection_upload_bytes_by_node{node_group=\"airport\"}[1m]), 0))",
+          "legendFormat": "upload",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Current connection traffic rate routed through airport nodes."
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Self-hosted Node Traffic",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 78,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(clamp_min(rate(mihomo_connection_download_bytes_by_node{node_group=\"self_hosted\"}[1m]), 0))",
+          "legendFormat": "download",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(clamp_min(rate(mihomo_connection_upload_bytes_by_node{node_group=\"self_hosted\"}[1m]), 0))",
+          "legendFormat": "upload",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Current connection traffic rate routed through self-hosted nodes."
+    },
+    {
+      "id": 28,
+      "type": "timeseries",
+      "title": "Node Group Availability History",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "system-monitoring"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 86,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "mihomo_node_group_available_ratio{node_group=\"airport\"}",
+          "legendFormat": "Airport Nodes",
+          "refId": "A"
+        },
+        {
+          "expr": "mihomo_node_group_available_ratio{node_group=\"self_hosted\"}",
+          "legendFormat": "Self-hosted Nodes",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Available nodes divided by total nodes for each group; the alert threshold is 20%."
     }
   ]
 }

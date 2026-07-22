@@ -71,9 +71,11 @@ sudo docker exec lab-prometheus wget -qO- --post-data='' http://localhost:9090/-
 
 ## Alert routing
 
-`alertmanager/alertmanager.yml` keeps a no-op default receiver and routes selected
-Mihomo availability alerts to the local Apprise API, which forwards them through
-the configured Bark target.
+`alertmanager/alertmanager.yml` keeps a no-op default receiver and routes the
+per-node-group Mihomo availability alert to the local Apprise API, which
+forwards it through the configured Bark target. Alerts are grouped by
+`node_group`, use a long repeat interval to avoid notification spam during one
+incident, and send an explicit `resolved` notification when the group recovers.
 
 Alertmanager runs as UID/GID `65534` (`nobody`) in the upstream container image,
 so `/data/homelab/lab/system-monitoring/alertmanager` must be writable by
@@ -88,8 +90,11 @@ Components:
 
 - `lab-mihomo-exporter`: Dockerized `WhereAreBugs/mihomo-prometheus-exporter` running on `lab`, with a local patch that adds `mihomo_proxy_group_selected{group,proxy,type}` for proxy group selection dashboards.
 - Prometheus scrape job `mihomo-exporter`.
+- Stable `node_group` labels sourced from Mihomo's `AIRPORT` and `SELF-HOSTED`
+  organizational groups.
 - Recording rules for probe failure ratio and latency jitter.
-- Alerts for exporter down, selected proxy unavailable/high latency, and high probe failure ratio.
+- Alerts for exporter down, selected proxy unavailable/high latency, high probe
+  failure ratio, and per-group availability below 20% for 10 minutes.
 - Grafana dashboard `Mihomo Proxy Overview` provisioned under the `System Monitoring` folder.
 
 The exporter runs on `lab` and reads Mihomo's External Controller on the `proxy` Tailscale address `http://100.64.0.7:9090`. The controller is protected by Mihomo's `secret`, and metrics are stored in Prometheus on `lab`.
