@@ -33,15 +33,15 @@ func TestUpdateNodeGroups(t *testing.T) {
 	})
 	proxies := &ProxiesResponse{Proxies: map[string]ProxyInfo{
 		"AIRPORT":     {Type: "Selector", All: []string{"Airport A", "Airport B", "Traffic: 42 GB", "Expire: tomorrow"}},
-		"SELF-HOSTED": {Type: "Selector", All: []string{"SG-AnyTLS"}},
+		"SELF-HOSTED": {Type: "Selector", All: []string{"SV-AnyTLS"}},
 	}}
 
 	collector.updateNodeGroupsLocked(proxies)
 	if got := collector.nodeGroupLocked("Airport A"); got != "airport" {
 		t.Fatalf("Airport A group = %q, want airport", got)
 	}
-	if got := collector.nodeGroupLocked("SG-AnyTLS"); got != "self_hosted" {
-		t.Fatalf("SG-AnyTLS group = %q, want self_hosted", got)
+	if got := collector.nodeGroupLocked("SV-AnyTLS"); got != "self_hosted" {
+		t.Fatalf("SV-AnyTLS group = %q, want self_hosted", got)
 	}
 	if got := collector.nodeGroupLocked("PASS"); got != "unclassified" {
 		t.Fatalf("PASS group = %q, want unclassified", got)
@@ -57,7 +57,7 @@ func TestExcludedMonitoringProxy(t *testing.T) {
 			t.Fatalf("%q should be excluded", name)
 		}
 	}
-	if isExcludedMonitoringProxy("SG-AnyTLS") {
-		t.Fatal("SG-AnyTLS should not be excluded")
+	if isExcludedMonitoringProxy("SV-AnyTLS") {
+		t.Fatal("SV-AnyTLS should not be excluded")
 	}
 }

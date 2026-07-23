@@ -30,7 +30,7 @@ The maintained AdGuard template includes these local wildcard rewrites:
 - `pve.skywt` -> `100.64.0.4` for the Proxmox VE host.
 - `gz.skywt` -> `101.33.238.184`.
 - `la.skywt` -> `45.32.88.139`.
-- `sg.skywt` -> `45.32.120.65` for the Singapore server.
+- `sv.skywt` -> `149.28.207.61` for the Silicon Valley server.
 
 ## Secrets
 

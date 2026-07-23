@@ -166,8 +166,8 @@ filtering:
     - domain: la.skywt
       answer: 45.32.88.139
       enabled: true
-    - domain: sg.skywt
-      answer: 45.32.120.65
+    - domain: sv.skywt
+      answer: 149.28.207.61
       enabled: true
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
