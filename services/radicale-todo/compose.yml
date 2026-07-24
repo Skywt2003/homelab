@@ -1,0 +1,32 @@
+services:
+  radicale-todo:
+    image: tomsquest/docker-radicale@sha256:b563a587c5f8e0c1f9a52177bced2e9191293de51b5ddeef15a86d2c602ad41b
+    container_name: lab-radicale-todo
+    restart: unless-stopped
+    volumes:
+      - ./config:/config/config:ro
+      - /data/homelab/lab/radicale-todo/data:/data
+    secrets:
+      - source: radicale_todo_users
+        target: users
+    networks:
+      - lab-proxy
+    labels:
+      caddy: todo.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5232}}"
+      labdash.enable: "true"
+      labdash.name: todo
+      labdash.appname: Calendar & Reminders
+      labdash.url: https://todo.lab.skywt
+      labdash.icon: calendar-check
+      labdash.group: Services
+      labdash.order: "52"
+
+secrets:
+  radicale_todo_users:
+    file: /run/homelab/secrets/radicale-todo/users
+
+networks:
+  lab-proxy:
+    external: true

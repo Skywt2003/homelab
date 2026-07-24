@@ -105,6 +105,13 @@ materialize_radicale() {
   write_secret radicale /radicale USERS users 0444
 }
 
+materialize_radicale_todo() {
+  # Compose implements file-backed secrets as bind mounts, so uid/gid/mode
+  # overrides are ignored. Keep the host directory root-only and make only the
+  # mounted htpasswd file readable by Radicale's UID 2999.
+  write_secret radicale-todo /radicale-todo USERS users 0444
+}
+
 materialize_rsshub() {
   write_secret rsshub /rsshub TWITTER_AUTH_TOKEN twitter_auth_token
 }
@@ -120,6 +127,7 @@ case "$action" in
   immich) materialize_immich ;;
   nexus-admin) materialize_nexus_admin ;;
   radicale) materialize_radicale ;;
+  radicale-todo) materialize_radicale_todo ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
   all)
@@ -128,6 +136,7 @@ case "$action" in
     materialize_immich
     materialize_nexus_admin
     materialize_radicale
+    materialize_radicale_todo
     materialize_rsshub
     materialize_system_monitoring
     ;;

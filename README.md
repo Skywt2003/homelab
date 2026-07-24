@@ -23,6 +23,7 @@ Configuration for services running on the `lab` host.
 - `services/pve`: Proxmox VE HTTPS certificate and port-443 configuration for `pve.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/radicale`: Radicale CalDAV/CardDAV service for `vcards.lab.skywt`.
+- `services/radicale-todo`: independent Radicale CalDAV service for Apple Calendar and Reminders at `todo.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
 - `docs`: operating procedures and audit notes.
@@ -87,6 +88,7 @@ Current paths:
 - `/data/homelab/lab/new-api/data`
 - `/data/homelab/lab/nexus-admin/env`
 - `/data/homelab/lab/radicale/data`
+- `/data/homelab/lab/radicale-todo/data`
 - `/data/homelab/lab/rsshub/env`
 - `/data/homelab/lab/rsshub/redis`
 - `/data/homelab/lab/system-monitoring/prometheus`
@@ -122,6 +124,7 @@ sudo install -d -m 0775 -o 1000 -g 1000 /data/homelab/lab/moviepilot/{config,cor
 sudo mkdir -p /data/homelab/lab/new-api/data
 sudo mkdir -p /data/homelab/lab/nexus-admin/env
 sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale/data
+sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale-todo/data
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager

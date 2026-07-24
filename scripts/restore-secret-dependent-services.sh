@@ -40,6 +40,7 @@ services=(
   docker-registry
   nexus-admin
   radicale
+  radicale-todo
   rsshub
   system-monitoring
   immich

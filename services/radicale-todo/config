@@ -1,0 +1,21 @@
+[server]
+hosts = 0.0.0.0:5232
+
+[auth]
+type = htpasswd
+htpasswd_filename = /run/secrets/users
+htpasswd_encryption = autodetect
+realm = Radicale Calendar and Reminders
+
+[rights]
+type = owner_only
+
+[storage]
+filesystem_folder = /data/collections
+
+[web]
+type = internal
+
+[logging]
+level = info
+mask_passwords = True
