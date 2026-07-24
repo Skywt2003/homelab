@@ -11,7 +11,11 @@ services:
       - lab-proxy
     volumes:
       - /data/homelab/lab/calibre-web/config:/config
-      - /data/homelab/lab/calibre-web/books:/books
+      - type: volume
+        source: calibre-books
+        target: /books
+        volume:
+          nocopy: true
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8083/"]
       interval: 30s
@@ -33,3 +37,12 @@ services:
 networks:
   lab-proxy:
     external: true
+
+volumes:
+  calibre-books:
+    name: lab-calibre-web-books
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.21,rw,nfsvers=4.2,proto=tcp,hard,resvport
+      device: ":/Books"

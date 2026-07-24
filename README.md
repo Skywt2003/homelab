@@ -61,6 +61,10 @@ them. See [Secret Management SOP](docs/secret-management-sop.md#boot-time-recove
 
 Mutable runtime state is not maintained in Git. It lives under `/data/homelab/lab` on the `lab` host.
 
+The Calibre book library is an exception: it lives in the OMV `Books` shared
+folder on `nas` and is mounted into Calibre-Web over NFS. Only Calibre-Web's
+application configuration remains local to `lab`.
+
 Current paths:
 
 - `/data/homelab/lab/android-scrcpy/adb`
@@ -73,7 +77,6 @@ Current paths:
 - `/data/homelab/lab/caddy/data`
 - `/data/homelab/lab/caddy/config`
 - `/data/homelab/lab/calibre-web/config`
-- `/data/homelab/lab/calibre-web/books`
 - `/data/homelab/lab/docker-registry/data`
 - `/data/homelab/lab/gitea/data`
 - `/data/homelab/lab/grafana/data`
