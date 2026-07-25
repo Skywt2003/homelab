@@ -40,8 +40,19 @@ services:
     image: ghcr.io/immich-app/immich-machine-learning:v3.0.3
     container_name: lab-immich-machine-learning
     restart: unless-stopped
+    cpus: 1.0
     environment:
       TZ: Etc/UTC
+      MACHINE_LEARNING_REQUEST_THREADS: "1"
+      MACHINE_LEARNING_MODEL_INTRA_OP_THREADS: "1"
+      MACHINE_LEARNING_MAX_BATCH_SIZE__OCR: "2"
+      HTTP_PROXY: http://proxy:10810
+      HTTPS_PROXY: http://proxy:10810
+      ALL_PROXY: http://proxy:10810
+      http_proxy: http://proxy:10810
+      https_proxy: http://proxy:10810
+      all_proxy: http://proxy:10810
+      NO_PROXY: localhost,127.0.0.1,::1,immich-server,database,redis,.lab.skywt
     networks:
       - immich
     volumes:
