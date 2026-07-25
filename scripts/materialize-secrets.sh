@@ -117,8 +117,9 @@ materialize_rsshub() {
 }
 
 materialize_system_monitoring() {
-  # The exporter runs as a non-root user and reads this through MIHOMO_API_TOKEN_FILE.
+  # The exporters run as non-root users and read these Docker secret mounts.
   write_secret system-monitoring /system-monitoring MIHOMO_API_TOKEN mihomo_api_token 0444
+  write_secret system-monitoring /system-monitoring PVE_TOKEN_VALUE pve_token_value 0444
 }
 
 case "$action" in

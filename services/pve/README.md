@@ -50,10 +50,37 @@ nft list table inet pve_webui_443
 systemctl status pve-webui-443.service pveproxy
 ```
 
+## Monitoring
+
+The existing Lab Prometheus stack scrapes PVE through Tailscale in two ways:
+
+- Debian's `prometheus-node-exporter` listens only on `100.64.0.4:9100` and
+  exposes host CPU, memory, disk, network, thermal, and selected systemd data.
+- `prometheus-pve-exporter` runs in the Lab monitoring stack and reads the PVE
+  API using the privilege-separated `prometheus@pve!exporter` token. The user
+  has only the built-in `PVEAuditor` role at `/`.
+
+Install or refresh the maintained Node Exporter configuration with:
+
+```bash
+apt-get install -y prometheus-node-exporter
+install -m 0644 prometheus-node-exporter.default \
+  /etc/default/prometheus-node-exporter
+systemctl restart prometheus-node-exporter
+systemctl enable prometheus-node-exporter
+```
+
+Validate the PVE-side endpoint:
+
+```bash
+systemctl status prometheus-node-exporter
+ss -lntp | grep 100.64.0.4:9100
+curl --noproxy '*' http://100.64.0.4:9100/metrics
+```
+
 Port 8006 remains available as a recovery path. To remove only the port-443
 mapping:
 
 ```bash
 systemctl disable --now pve-webui-443.service
 ```
-

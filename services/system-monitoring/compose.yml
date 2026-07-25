@@ -59,6 +59,31 @@ services:
       - /:/rootfs:ro,rslave
     logging: *default-logging
 
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter:latest
+    container_name: lab-pve-exporter
+    restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - |
+        export PVE_TOKEN_VALUE="`cat /run/secrets/pve_token_value`"
+        exec /opt/prometheus-pve-exporter/bin/pve_exporter --no-collector.subscription
+    environment:
+      PVE_USER: prometheus@pve
+      PVE_TOKEN_NAME: exporter
+      # The API is reached only over Tailscale. The PVE certificate is issued
+      # by the private lab CA, which is not present in the exporter image.
+      PVE_VERIFY_SSL: "false"
+    secrets:
+      - source: system_monitoring_pve_token_value
+        target: pve_token_value
+        mode: 0444
+    networks:
+      - system-monitoring
+    logging: *default-logging
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: lab-cadvisor
@@ -163,6 +188,8 @@ services:
 secrets:
   system_monitoring_mihomo_api_token:
     file: /run/homelab/secrets/system-monitoring/mihomo_api_token
+  system_monitoring_pve_token_value:
+    file: /run/homelab/secrets/system-monitoring/pve_token_value
 
 networks:
   lab-proxy:

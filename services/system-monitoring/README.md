@@ -1,11 +1,13 @@
 # System Monitoring
 
-This stack provides metrics collection, storage, push metrics, and alert routing for the `lab` host. Dashboards and visualization are provided by `services/grafana`.
+This stack provides metrics collection, storage, push metrics, and alert routing for the `lab` and `pve` hosts. Dashboards and visualization are provided by `services/grafana`.
 
 ## Components
 
 - Prometheus: metrics storage and query API, exposed at `https://prometheus.lab.skywt`.
 - Node Exporter: host CPU, memory, disk, network, and OS metrics; internal only.
+- PVE Node Exporter: native PVE host CPU, memory, disk, network, thermal, and OS metrics, scraped over Tailscale.
+- Prometheus PVE Exporter: read-only Proxmox API metrics for the PVE node, storage, and every VM; internal only.
 - cAdvisor: Docker container metrics; internal only.
 - Pushgateway: optional push endpoint for batch/one-shot jobs; internal only by default.
 - Alertmanager: alert grouping and routing, exposed at `https://alertmanager.lab.skywt`.
@@ -33,13 +35,16 @@ Grafana dashboard catalog.
 
 The Mihomo API token is generated and owned by the Mihomo instance on the `proxy` host, so it is an externally-generated secret.
 
-`MIHOMO_API_TOKEN` is managed in Infisical path `/system-monitoring` and materialized to:
+`MIHOMO_API_TOKEN` and the externally-issued `PVE_TOKEN_VALUE` are managed in Infisical path `/system-monitoring` and materialized to:
 
 - `/run/homelab/secrets/system-monitoring/mihomo_api_token`
+- `/run/homelab/secrets/system-monitoring/pve_token_value`
 
 Compose mounts the token as a Docker secret and uses a shell wrapper in the existing `homelab/mihomo-prometheus-exporter:local` image to export `MIHOMO_API_TOKEN` immediately before `exec /mihomo-exporter`, so the token value is not present in the Compose file or rendered Docker config.
 
 Do not add monitoring tokens, Alertmanager receiver credentials, webhook URLs, SMTP passwords, or chat bot tokens to Git-maintained files.
+
+The PVE token belongs to `prometheus@pve`, is named `exporter`, uses privilege separation, and receives only the built-in `PVEAuditor` role at `/`. Rotate it with `pveum user token remove/add`, then replace `PVE_TOKEN_VALUE` in Infisical and rematerialize this stack.
 
 ## Deploy
 
@@ -61,6 +66,11 @@ docker compose -f compose.yml config
 sudo docker compose -f compose.yml ps
 sudo docker logs --tail 80 lab-prometheus
 ```
+
+The PVE host runs Debian's `prometheus-node-exporter` systemd service on port
+`9100`. Prometheus reaches both the node exporter and the PVE API at
+`100.64.0.4` over Tailscale; neither exporter is published by the Lab Docker
+stack. The provisioned Grafana dashboard is `PVE Host and VM Overview`.
 
 Prometheus can reload configuration without restarting the container because
 `--web.enable-lifecycle` is enabled:

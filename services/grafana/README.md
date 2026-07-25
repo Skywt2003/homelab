@@ -8,7 +8,8 @@ Provisioned datasources are maintained under `provisioning/datasources/`. The
 `System Monitoring` Prometheus datasource points to the
 `services/system-monitoring` stack over the shared Docker network.
 Provisioned dashboards are maintained under `dashboards/` and loaded by
-`provisioning/dashboards/`. The initial dashboard is `Lab Host Overview`.
+`provisioning/dashboards/`. Host dashboards include `Lab Host Overview` and
+`PVE Host and VM Overview`.
 
 Runtime state is stored outside this Git repository:
 

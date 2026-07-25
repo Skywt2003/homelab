@@ -22,6 +22,39 @@ scrape_configs:
         labels:
           host: lab
 
+  - job_name: pve-node-exporter
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - 100.64.0.4:9100
+        labels:
+          host: pve
+
+  - job_name: pve
+    scrape_interval: 15s
+    metrics_path: /pve
+    params:
+      module:
+        - default
+      cluster:
+        - "1"
+      node:
+        - "1"
+    static_configs:
+      - targets:
+          - 100.64.0.4
+        labels:
+          host: pve
+    relabel_configs:
+      - source_labels:
+          - __address__
+        target_label: __param_target
+      - source_labels:
+          - __param_target
+        target_label: instance
+      - target_label: __address__
+        replacement: pve-exporter:9221
+
   - job_name: cadvisor
     scrape_interval: 5s
     static_configs:
