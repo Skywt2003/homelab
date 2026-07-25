@@ -1,0 +1,33 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.36.0
+    container_name: lab-vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: https://passwords.lab.skywt
+      SIGNUPS_ALLOWED: "true"
+      TZ: Etc/UTC
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/vaultwarden/data:/data
+    labels:
+      caddy: passwords.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      labdash.enable: "true"
+      labdash.name: passwords
+      labdash.appname: Vaultwarden
+      labdash.url: https://passwords.lab.skywt
+      labdash.icon: shield-lock
+      labdash.group: Personal
+      labdash.order: "30"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  lab-proxy:
+    external: true

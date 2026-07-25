@@ -27,6 +27,7 @@ Configuration for services running on the `lab` host.
 - `services/radicale-todo`: independent Radicale CalDAV service for Apple Calendar and Reminders at `todo.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
+- `services/vaultwarden`: Vaultwarden password manager for `passwords.lab.skywt`.
 - `docs`: operating procedures and audit notes.
 
 ## Documentation
@@ -101,6 +102,7 @@ Current paths:
 - `/data/homelab/lab/rsshub/redis`
 - `/data/homelab/lab/system-monitoring/prometheus`
 - `/data/homelab/lab/system-monitoring/alertmanager`
+- `/data/homelab/lab/vaultwarden/data`
 
 ## Deploy
 
@@ -137,6 +139,7 @@ sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale-todo/data
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
+sudo mkdir -p /data/homelab/lab/vaultwarden/data
 ```
 
 ArchiveBox still requires initialization before the first normal start:
