@@ -1,0 +1,46 @@
+services:
+  backrest:
+    image: ghcr.io/garethgeorge/backrest:v1.13.0
+    container_name: lab-backrest
+    restart: unless-stopped
+    environment:
+      BACKREST_PORT: 0.0.0.0:9898
+      BACKREST_CONFIG: /config/config.json
+      BACKREST_DATA: /data
+      XDG_CACHE_HOME: /cache
+      TMPDIR: /tmp
+      TZ: Etc/UTC
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/backrest/config:/config
+      - /data/homelab/lab/backrest/data:/data
+      - /data/homelab/lab/backrest/cache:/cache
+      - /data/homelab/lab/backrest/tmp:/tmp
+      - /mnt/backups:/repos
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:9898/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      caddy: backups.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9898}}"
+      labdash.enable: "true"
+      labdash.name: backups
+      labdash.appname: Backrest
+      labdash.url: https://backups.lab.skywt
+      labdash.icon: database
+      labdash.group: Infrastructure
+      labdash.order: "50"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  lab-proxy:
+    external: true

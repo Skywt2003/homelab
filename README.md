@@ -7,6 +7,7 @@ Configuration for services running on the `lab` host.
 - `services/apprise-api`: Apprise API notification gateway for `notify.lab.skywt`.
 - `services/android-scrcpy`: Browser-accessible Android remote control for `phone.lab.skywt`.
 - `services/archivebox`: ArchiveBox for `archive.lab.skywt`.
+- `services/backrest`: Backrest and restic backup management for `backups.lab.skywt`.
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/calibre-web`: Calibre-Web ebook library for `books.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
@@ -67,6 +68,10 @@ application configuration remains local to `lab`.
 
 Current paths:
 
+- `/data/homelab/lab/backrest/config`
+- `/data/homelab/lab/backrest/data`
+- `/data/homelab/lab/backrest/cache`
+- `/data/homelab/lab/backrest/tmp`
 - `/data/homelab/lab/android-scrcpy/adb`
 - `/data/homelab/lab/adguard/conf`
 - `/data/homelab/lab/adguard/work`
@@ -113,6 +118,7 @@ sudo install -d -m 0700 -o root -g root /data/homelab/lab/android-scrcpy/adb
 sudo mkdir -p /data/homelab/lab/apprise-api/{config,attach,plugin}
 sudo chown -R 1000:1000 /data/homelab/lab/apprise-api
 sudo mkdir -p /data/homelab/lab/archivebox/data
+sudo install -d -m 0750 /data/homelab/lab/backrest/{config,data,cache,tmp}
 sudo mkdir -p /data/homelab/lab/calibre-web/{config,books}
 sudo chown -R 1000:1000 /data/homelab/lab/calibre-web
 sudo mkdir -p /data/homelab/lab/docker-registry/data
