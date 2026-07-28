@@ -1,5 +1,12 @@
 # Base Caddyfile extended by caddy-docker-proxy.
 # Exposes lab Caddy's built-in ACME server for internal lab/dev names.
+{
+	pki {
+		ca local {
+			intermediate_lifetime 30d
+		}
+	}
+}
 
 acme.lab.skywt {
 	tls internal

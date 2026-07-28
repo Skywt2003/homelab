@@ -9,7 +9,11 @@ Home Assistant is the exception: it uses host networking for local device discov
 The same Caddy instance also exposes the internal ACME server at `https://acme.lab.skywt` for selected internal names. It currently allows `*.lab.skywt`, `*.dev.skywt`, `nas.skywt`, and `pve.skywt`. The NAS host runs its own Caddy and obtains the `nas.skywt` certificate from this ACME server; the PVE host uses its built-in ACME client for `pve.skywt`.
 
 The ACME server issues certificates with a 72-hour lifetime. This accommodates
-PVE's daily renewal job while retaining short-lived internal certificates.
+PVE's daily renewal job while retaining short-lived internal certificates. The
+local CA uses a 30-day intermediate certificate and Caddy's 20% default renewal
+window. This keeps the 72-hour leaf lifetime safely below the 6-day intermediate
+renewal window, so a leaf cannot outlive the intermediate that signed it during
+normal rotation.
 
 Caddy owns the shared Docker network:
 
