@@ -56,7 +56,7 @@ scrape_configs:
         replacement: pve-exporter:9221
 
   - job_name: cadvisor
-    scrape_interval: 5s
+    scrape_interval: 15s
     static_configs:
       - targets:
           - cadvisor:8080

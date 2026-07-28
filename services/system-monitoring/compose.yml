@@ -85,9 +85,16 @@ services:
     logging: *default-logging
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: ghcr.io/google/cadvisor:0.55.1
     container_name: lab-cadvisor
     restart: unless-stopped
+    command:
+      - --store_container_labels=false
+      - --docker_only=true
+      - --disable_root_cgroup_stats=true
+      - --housekeeping_interval=10s
+      - --max_housekeeping_interval=30s
+      - --enable_metrics=cpu,memory,network,oom_event
     privileged: true
     devices:
       - /dev/kmsg:/dev/kmsg
