@@ -5,8 +5,18 @@ services:
     restart: unless-stopped
     environment:
       DOMAIN: https://passwords.lab.skywt
-      SIGNUPS_ALLOWED: "true"
+      SIGNUPS_ALLOWED: "false"
       TZ: Etc/UTC
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - |
+        export ADMIN_TOKEN="$$(cat /run/secrets/admin_token)"
+        exec /start.sh
+    secrets:
+      - source: vaultwarden_admin_token
+        target: admin_token
     networks:
       - lab-proxy
     volumes:
@@ -31,3 +41,7 @@ services:
 networks:
   lab-proxy:
     external: true
+
+secrets:
+  vaultwarden_admin_token:
+    file: /run/homelab/secrets/vaultwarden/admin_token

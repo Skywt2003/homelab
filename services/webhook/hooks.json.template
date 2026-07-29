@@ -1,0 +1,68 @@
+[
+  {
+    "id": "immich-home",
+    "execute-command": "/opt/webhook/scripts/immich-queues.sh",
+    "command-working-directory": "/tmp",
+    "http-methods": [
+      "POST"
+    ],
+    "pass-arguments-to-command": [
+      {
+        "source": "string",
+        "name": "pause"
+      }
+    ],
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "value": "__WEBHOOK_TOKEN__",
+        "parameter": {
+          "source": "header",
+          "name": "X-Webhook-Token"
+        }
+      }
+    },
+    "trigger-rule-mismatch-http-response-code": 401,
+    "response-headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "include-command-output-in-response": true,
+    "include-command-output-in-response-on-error": true
+  },
+  {
+    "id": "immich-away",
+    "execute-command": "/opt/webhook/scripts/immich-queues.sh",
+    "command-working-directory": "/tmp",
+    "http-methods": [
+      "POST"
+    ],
+    "pass-arguments-to-command": [
+      {
+        "source": "string",
+        "name": "resume"
+      }
+    ],
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "value": "__WEBHOOK_TOKEN__",
+        "parameter": {
+          "source": "header",
+          "name": "X-Webhook-Token"
+        }
+      }
+    },
+    "trigger-rule-mismatch-http-response-code": 401,
+    "response-headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "include-command-output-in-response": true,
+    "include-command-output-in-response-on-error": true
+  }
+]

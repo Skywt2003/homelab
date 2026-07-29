@@ -14,18 +14,25 @@ CA.
 
 ## First account and registration
 
-Registration is enabled initially so the first account can be created. After
-creating and verifying the intended account, set `SIGNUPS_ALLOWED` to `"false"`
-in `compose.yml` and redeploy the stack. Existing users can continue to sign in.
+Registration is disabled with `SIGNUPS_ALLOWED` set to `"false"`. Existing users
+can continue to sign in. Temporarily enable it only when intentionally creating
+a new account, then disable it and redeploy the stack again.
 
-No application secret is required for this initial deployment. The Vaultwarden
-admin page is not enabled because no admin token is configured.
+The admin page is enabled at `https://passwords.lab.skywt/admin`. Its login
+password is stored in the Vaultwarden login item for that URL. Vaultwarden
+receives only an Argon2id PHC hash, stored in Infisical under project `homelab`,
+environment `prod`, path `/vaultwarden`, secret name `ADMIN_TOKEN`.
+
+The hash is materialized to
+`/run/homelab/secrets/vaultwarden/admin_token` and injected immediately before
+the Vaultwarden process starts; it must never be committed or printed.
 
 ## Deploy
 
 ```bash
 sudo mkdir -p /data/homelab/lab/vaultwarden/data
 cd ~/homelab/services/vaultwarden
+sudo ../../scripts/materialize-secrets.sh vaultwarden
 sudo docker compose -f compose.yml up -d
 ```
 

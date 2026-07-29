@@ -1,0 +1,54 @@
+services:
+  webhook:
+    build:
+      context: .
+    image: homelab/webhook:2.8.3
+    container_name: lab-webhook
+    restart: unless-stopped
+    entrypoint: /opt/webhook/scripts/entrypoint.sh
+    command:
+      - -hooks=/tmp/hooks.json
+      - -hotreload
+      - -port=9000
+      - -verbose
+    networks:
+      - lab-proxy
+      - immich
+    secrets:
+      - source: webhook_token
+        target: webhook_token
+      - source: immich_api_key
+        target: immich_api_key
+    volumes:
+      - ./hooks.json.template:/etc/webhook/hooks.json.template:ro
+      - ./scripts:/opt/webhook/scripts:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 9000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    labels:
+      caddy: webhook.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+
+networks:
+  lab-proxy:
+    external: true
+  immich:
+    external: true
+    name: lab-immich
+
+secrets:
+  webhook_token:
+    file: /run/homelab/secrets/webhook/webhook_token
+  immich_api_key:
+    file: /run/homelab/secrets/webhook/immich_api_key

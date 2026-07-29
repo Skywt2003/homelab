@@ -26,6 +26,7 @@ Configuration for services running on the `lab` host.
 - `services/radicale`: Radicale CalDAV/CardDAV service for `vcards.lab.skywt`.
 - `services/radicale-todo`: independent Radicale CalDAV service for Apple Calendar and Reminders at `todo.lab.skywt`.
 - `services/rsshub`: RSSHub for `rsshub.lab.skywt`.
+- `services/stalwart`: internal-only SMTP/IMAP mail service at `mail.lab.skywt` for the `@skywt.internal` mail domain.
 - `services/system-monitoring`: Prometheus, exporters, Alertmanager, and Mihomo proxy monitoring.
 - `services/vaultwarden`: Vaultwarden password manager for `passwords.lab.skywt`.
 - `docs`: operating procedures and audit notes.
@@ -100,6 +101,9 @@ Current paths:
 - `/data/homelab/lab/radicale-todo/data`
 - `/data/homelab/lab/rsshub/env`
 - `/data/homelab/lab/rsshub/redis`
+- `/data/homelab/lab/stalwart/etc`
+- `/data/homelab/lab/stalwart/data`
+- `/data/homelab/lab/stalwart/tls`
 - `/data/homelab/lab/system-monitoring/prometheus`
 - `/data/homelab/lab/system-monitoring/alertmanager`
 - `/data/homelab/lab/vaultwarden/data`
@@ -137,6 +141,8 @@ sudo mkdir -p /data/homelab/lab/nexus-admin/env
 sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale/data
 sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale-todo/data
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}
+sudo install -d -m 0750 -o 2000 -g 2000 /data/homelab/lab/stalwart/{etc,data}
+sudo install -d -m 0755 -o root -g root /data/homelab/lab/stalwart/tls
 sudo mkdir -p /data/homelab/lab/system-monitoring/prometheus
 sudo mkdir -p /data/homelab/lab/system-monitoring/alertmanager
 sudo mkdir -p /data/homelab/lab/vaultwarden/data

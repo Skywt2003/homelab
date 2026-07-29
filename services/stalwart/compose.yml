@@ -1,0 +1,52 @@
+services:
+  stalwart:
+    image: stalwartlabs/stalwart@sha256:4f926193e5dd9ceb1e24ba48160702310381b12e51972c2fb0cc9de020388136
+    container_name: lab-stalwart
+    restart: unless-stopped
+    environment:
+      STALWART_HOSTNAME: mail.skywt.internal
+      STALWART_PUBLIC_URL: https://mail.lab.skywt
+      HTTP_PROXY: http://proxy:10810
+      HTTPS_PROXY: http://proxy:10810
+      http_proxy: http://proxy:10810
+      https_proxy: http://proxy:10810
+      NO_PROXY: localhost,127.0.0.1,::1,lab-stalwart,lab-caddy,acme.lab.skywt,mail.lab.skywt,mail.skywt.internal,.skywt.internal,.lab.skywt,100.64.0.0/10,172.16.0.0/12
+      no_proxy: localhost,127.0.0.1,::1,lab-stalwart,lab-caddy,acme.lab.skywt,mail.lab.skywt,mail.skywt.internal,.skywt.internal,.lab.skywt,100.64.0.0/10,172.16.0.0/12
+    extra_hosts:
+      - "proxy:100.64.0.7"
+    ports:
+      # Authenticated SMTP submission for mail clients.
+      - "100.64.0.2:587:587"
+      # IMAP over implicit TLS for mail clients.
+      - "100.64.0.2:993:993"
+      # Unauthenticated SMTP for applications on the Tailscale network.
+      - "100.64.0.2:2525:2525"
+    networks:
+      - lab-proxy
+    volumes:
+      - /data/homelab/lab/stalwart/etc:/etc/stalwart
+      - /data/homelab/lab/stalwart/data:/var/lib/stalwart
+      # Add the lab root CA to the system trust bundle so Stalwart can use
+      # Caddy's internal ACME endpoint for automatic certificate renewal.
+      - /data/homelab/lab/stalwart/tls/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/healthz/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      caddy: mail.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      labdash.enable: "true"
+      labdash.name: mail
+      labdash.appname: Stalwart Mail
+      labdash.url: https://mail.lab.skywt
+      labdash.icon: mail
+      labdash.group: Services
+      labdash.order: "55"
+
+networks:
+  lab-proxy:
+    external: true

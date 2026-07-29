@@ -32,6 +32,10 @@ The maintained AdGuard template includes these local wildcard rewrites:
 - `la.skywt` -> `45.32.88.139`.
 - `sv.skywt` -> `149.28.207.61` for the Silicon Valley server.
 
+The maintained user rules also publish the internal mail exchanger:
+
+- `skywt.internal MX 10 mail.lab.skywt.`
+
 ## Secrets
 
 AdGuard Home's admin password hash is a secret-bearing authentication artifact even though it is not a plain password.

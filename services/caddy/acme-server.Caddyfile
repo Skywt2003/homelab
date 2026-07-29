@@ -1,6 +1,10 @@
 # Base Caddyfile extended by caddy-docker-proxy.
 # Exposes lab Caddy's built-in ACME server for internal lab/dev names.
 {
+	# Apple clients do not send SNI for a literal IP address. Use the LAN-IP
+	# certificate for such TLS handshakes so HomePod can call HTTPS by IP.
+	default_sni 192.168.1.236
+
 	pki {
 		ca local {
 			intermediate_lifetime 30d
@@ -30,4 +34,18 @@ acme.lab.skywt {
 home.lab.skywt {
 	tls internal
 	reverse_proxy host.docker.internal:8123
+}
+
+# Apple Home automations run on the home hub, which may not use the homelab DNS
+# resolver. Provide the webhook gateway on lab's LAN IP with an internal-CA
+# certificate so HomePod/Apple TV can connect without DNS.
+https://192.168.1.236 {
+	tls internal
+
+	@webhooks path /hooks/*
+	handle @webhooks {
+		reverse_proxy lab-webhook:9000
+	}
+
+	respond 404
 }

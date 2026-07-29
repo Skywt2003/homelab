@@ -109,7 +109,9 @@ statistics:
   ignored_enabled: false
 filters: []
 whitelist_filters: []
-user_rules: []
+user_rules:
+  # Internal-only mail discovery for the `skywt.internal` mail domain.
+  - '||skywt.internal^$dnsrewrite=NOERROR;MX;10 mail.lab.skywt'
 dhcp:
   enabled: false
   interface_name: ""

@@ -43,6 +43,8 @@ services=(
   radicale-todo
   rsshub
   system-monitoring
+  vaultwarden
+  webhook
   immich
 )
 

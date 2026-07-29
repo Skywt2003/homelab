@@ -86,6 +86,14 @@ materialize_immich() {
   write_secret immich /immich DB_PASSWORD database_password
 }
 
+materialize_webhook() {
+  # Compose implements file-backed secrets as bind mounts. Keep the host
+  # directory root-only and make the mounted files readable by uid 10001 in
+  # the unprivileged webhook container.
+  write_secret webhook / WEBHOOK_TOKEN webhook_token 0444
+  write_secret webhook / WEBHOOK_IMMICH_API_KEY immich_api_key 0444
+}
+
 materialize_android_scrcpy() {
   write_secret android-scrcpy /android-scrcpy VNC_PASSWORD vnc_password
 }
@@ -122,15 +130,21 @@ materialize_system_monitoring() {
   write_secret system-monitoring /system-monitoring PVE_TOKEN_VALUE pve_token_value 0444
 }
 
+materialize_vaultwarden() {
+  write_secret vaultwarden /vaultwarden ADMIN_TOKEN admin_token
+}
+
 case "$action" in
   android-scrcpy) materialize_android_scrcpy ;;
   docker-registry) materialize_docker_registry ;;
   immich) materialize_immich ;;
+  webhook) materialize_webhook ;;
   nexus-admin) materialize_nexus_admin ;;
   radicale) materialize_radicale ;;
   radicale-todo) materialize_radicale_todo ;;
   rsshub) materialize_rsshub ;;
   system-monitoring) materialize_system_monitoring ;;
+  vaultwarden) materialize_vaultwarden ;;
   all)
     materialize_android_scrcpy
     materialize_docker_registry
@@ -140,6 +154,8 @@ case "$action" in
     materialize_radicale_todo
     materialize_rsshub
     materialize_system_monitoring
+    materialize_vaultwarden
+    materialize_webhook
     ;;
   *)
     echo "unknown service: $action" >&2
