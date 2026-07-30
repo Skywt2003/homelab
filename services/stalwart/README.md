@@ -51,6 +51,31 @@ credentials are kept in Infisical at the project root using the
 `STALWART_*_PASSWORD` names for recovery and client setup; they are not
 committed or mounted into the container at runtime.
 
+## Application integrations
+
+Applications use `mail.lab.skywt:2525` without SMTP authentication or TLS.
+Where a recipient is required for system notifications, it is
+`me@skywt.internal`.
+
+| Service URL | Sender | Configuration storage |
+| --- | --- | --- |
+| `passwords.lab.skywt` | `passwords@skywt.internal` | Compose environment |
+| `git.lab.skywt` | `git@skywt.internal` | Compose environment |
+| `grafana.lab.skywt` | `grafana@skywt.internal` | Compose environment |
+| `secrets.lab.skywt` | `secrets@skywt.internal` | Infisical runtime env file |
+| `photos.lab.skywt` | `photos@skywt.internal` | Immich system configuration |
+| `ai-api.lab.skywt` | `ai-api@skywt.internal` | New API options database |
+| `books.lab.skywt` | `books@skywt.internal` | Calibre-Web app database |
+| `home.lab.skywt` | `home@skywt.internal` | Home Assistant SMTP config entry |
+| `alertmanager.lab.skywt` | `alertmanager@skywt.internal` | Alertmanager configuration |
+| `torrent.lab.skywt` | `torrent@skywt.internal` | qBittorrent preferences |
+| `notify.lab.skywt` | `notify@skywt.internal` | Apprise runtime configuration |
+
+Prometheus sends notifications through Alertmanager. MoviePilot itself does not
+provide an SMTP notification channel. Backrest supports email through a
+Shoutrrr hook attached to a repository or backup plan; configure
+`backups@skywt.internal` when a plan is created.
+
 ## Deploy
 
 ```bash

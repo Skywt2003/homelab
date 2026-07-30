@@ -14,6 +14,18 @@ trusts the `lab-proxy` Docker network for Caddy's forwarded client headers. It
 is mounted read-only; mutable Home Assistant state remains under the runtime
 configuration directory.
 
+## Email notifications
+
+Home Assistant has an SMTP config entry named `internal_email`, with the notify
+entity `notify.internal_email_me_skywt_internal`. It sends from
+`home@skywt.internal` to `me@skywt.internal` through the Tailnet-only,
+unauthenticated application listener at `mail.lab.skywt:2525`, without TLS.
+
+The integration was initially imported from YAML and is now stored in Home
+Assistant's mutable runtime configuration. Do not add the legacy `notify:` YAML
+block again: current Home Assistant releases migrate it to a config entry and
+otherwise log a misleading legacy platform initialization error on each boot.
+
 ## Bluetooth
 
 The PVE host passes its Intel AX200 Bluetooth USB function (`8087:0029`) to VM
