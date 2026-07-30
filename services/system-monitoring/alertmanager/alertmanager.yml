@@ -1,5 +1,9 @@
 global:
   resolve_timeout: 5m
+  smtp_from: alertmanager@skywt.internal
+  smtp_smarthost: mail.lab.skywt:2525
+  smtp_hello: alertmanager.lab.skywt
+  smtp_require_tls: false
 
 route:
   receiver: default
@@ -24,8 +28,16 @@ route:
 
 receivers:
   - name: default
+    email_configs:
+      - to: me@skywt.internal
+        send_resolved: true
+        require_tls: false
   - name: apprise-bark
     webhook_configs:
       - send_resolved: true
         # The title becomes "firing" or "resolved"; the body keeps group details.
         url: 'http://lab-apprise-api:8000/notify/apprise?:status=title&:commonAnnotations.description=body&:type=warning&:format=text'
+    email_configs:
+      - to: me@skywt.internal
+        send_resolved: true
+        require_tls: false
