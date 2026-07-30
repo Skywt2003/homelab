@@ -167,6 +167,7 @@ services:
     command:
       - --config.file=/etc/alertmanager/alertmanager.yml
       - --storage.path=/alertmanager
+      - --web.external-url=https://alertmanager.lab.skywt
     networks:
       - lab-proxy
       - system-monitoring

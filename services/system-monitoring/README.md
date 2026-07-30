@@ -14,7 +14,9 @@ This stack provides metrics collection, storage, push metrics, and alert routing
 
 Prometheus and Alertmanager are exposed through the shared Caddy reverse proxy by
 labels in `compose.yml`. Exporters stay on the stack-local `system-monitoring`
-network and are scraped only by Prometheus.
+network and are scraped only by Prometheus. Alertmanager's `--web.external-url`
+is set to `https://alertmanager.lab.skywt` so links in notification emails point
+to the reverse-proxied domain instead of the container address.
 
 Runtime state is stored outside this Git repository:
 
