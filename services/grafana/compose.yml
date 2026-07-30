@@ -6,6 +6,12 @@ services:
     environment:
       GF_SERVER_DOMAIN: grafana.lab.skywt
       GF_SERVER_ROOT_URL: https://grafana.lab.skywt/
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: mail.lab.skywt:2525
+      GF_SMTP_FROM_ADDRESS: grafana@skywt.internal
+      GF_SMTP_FROM_NAME: Grafana
+      GF_SMTP_EHLO_IDENTITY: grafana.lab.skywt
+      GF_SMTP_STARTTLS_POLICY: NoStartTLS
     networks:
       - lab-proxy
     volumes:

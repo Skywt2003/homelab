@@ -6,6 +6,13 @@ services:
     environment:
       DOMAIN: https://passwords.lab.skywt
       SIGNUPS_ALLOWED: "false"
+      # Internal SMTP relay. The dedicated application port accepts mail from
+      # the Tailnet without credentials and does not offer STARTTLS.
+      SMTP_HOST: mail.lab.skywt
+      SMTP_PORT: "2525"
+      SMTP_SECURITY: "off"
+      SMTP_FROM: passwords@skywt.internal
+      SMTP_FROM_NAME: Vaultwarden
       TZ: Etc/UTC
     entrypoint:
       - /bin/sh

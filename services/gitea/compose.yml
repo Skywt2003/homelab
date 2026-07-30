@@ -10,6 +10,14 @@ services:
       GITEA__server__ROOT_URL: https://git.lab.skywt/
       GITEA__server__SSH_DOMAIN: git.lab.skywt
       GITEA__server__SSH_PORT: 2222
+      # Internal unauthenticated SMTP relay for account and repository mail.
+      GITEA__mailer__ENABLED: "true"
+      GITEA__mailer__PROTOCOL: smtp
+      GITEA__mailer__SMTP_ADDR: mail.lab.skywt
+      GITEA__mailer__SMTP_PORT: "2525"
+      GITEA__mailer__FROM: 'Gitea <git@skywt.internal>'
+      GITEA__mailer__ENVELOPE_FROM: git@skywt.internal
+      GITEA__mailer__HELO_HOSTNAME: git.lab.skywt
       # Gitea does not use http_proxy/https_proxy unless its own proxy support
       # is enabled. Match GitHub and its asset/API hosts for migrations and
       # repository mirror updates.
@@ -24,8 +32,8 @@ services:
       http_proxy: http://proxy:10810
       https_proxy: http://proxy:10810
       all_proxy: http://proxy:10810
-      NO_PROXY: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,.lab.skywt,lab-proxy
-      no_proxy: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,.lab.skywt,lab-proxy
+      NO_PROXY: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,mail.lab.skywt,.lab.skywt,.skywt.internal,lab-proxy
+      no_proxy: localhost,127.0.0.1,::1,lab-gitea,gitea,lab-caddy,mail.lab.skywt,.lab.skywt,.skywt.internal,lab-proxy
     extra_hosts:
       - "proxy:100.64.0.7"
     ports:
