@@ -29,7 +29,7 @@ route:
 receivers:
   - name: default
     email_configs:
-      - to: me@skywt.internal
+      - to: agent@skywt.internal
         send_resolved: true
         require_tls: false
   - name: apprise-bark
@@ -38,6 +38,6 @@ receivers:
         # The title becomes "firing" or "resolved"; the body keeps group details.
         url: 'http://lab-apprise-api:8000/notify/apprise?:status=title&:commonAnnotations.description=body&:type=warning&:format=text'
     email_configs:
-      - to: me@skywt.internal
+      - to: agent@skywt.internal
         send_resolved: true
         require_tls: false
