@@ -19,6 +19,15 @@ The Git-maintained template is:
 Use it to bootstrap a new runtime config, then update the admin password hash
 before starting AdGuard Home.
 
+## Upstream resolvers
+
+The maintained configuration sends queries in parallel to AliDNS and DNSPod
+over DNS-over-HTTPS.  Their plain DNS endpoints are used only for bootstrap
+and fallback so an intermittent UDP/53 failure does not block normal queries
+for the full upstream timeout.  Query limiting remains enabled at 20 QPS per
+individual IPv4 or IPv6 client instead of aggregating all current
+`100.64.0.x` clients into the same `/24` rate-limit bucket.
+
 
 ## Local rewrites
 

@@ -25,19 +25,21 @@ dns:
   port: 53
   anonymize_client_ip: false
   ratelimit: 20
-  ratelimit_subnet_len_ipv4: 24
-  ratelimit_subnet_len_ipv6: 56
+  ratelimit_subnet_len_ipv4: 32
+  ratelimit_subnet_len_ipv6: 128
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - https://dns10.quad9.net/dns-query
-    - https://dns.google/dns-query
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
-    - 9.9.9.10
-    - 8.8.8.8
-  fallback_dns: []
-  upstream_mode: load_balance
+    - 223.5.5.5
+    - 119.29.29.29
+  fallback_dns:
+    - 223.5.5.5
+    - 119.29.29.29
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
@@ -67,7 +69,7 @@ dns:
   ipset: []
   ipset_file: ""
   bootstrap_prefer_ipv6: false
-  upstream_timeout: 10s
+  upstream_timeout: 3s
   private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
