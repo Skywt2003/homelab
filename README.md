@@ -21,6 +21,7 @@ Configuration for services running on the `lab` host.
 - `services/infisical`: Infisical secret management platform for `secrets.lab.skywt`.
 - `services/moviepilot`: MoviePilot media automation and qBittorrent for `media.lab.skywt` and `torrent.lab.skywt`.
 - `services/new-api`: New API LLM gateway for `ai-api.lab.skywt`.
+- `services/portainer`: Portainer CE Docker management UI for `containers.lab.skywt`.
 - `services/pve`: Proxmox VE HTTPS certificate and port-443 configuration for `pve.skywt`.
 - `services/nexus-admin`: Nexus Admin for `blog-admin.lab.skywt`.
 - `services/radicale`: Radicale CalDAV/CardDAV service for `vcards.lab.skywt`.
@@ -97,6 +98,7 @@ Current paths:
 - `/data/homelab/lab/moviepilot/qbittorrent`
 - `/data/homelab/lab/new-api/data`
 - `/data/homelab/lab/nexus-admin/env`
+- `/data/homelab/lab/portainer/data`
 - `/data/homelab/lab/radicale/data`
 - `/data/homelab/lab/radicale-todo/data`
 - `/data/homelab/lab/rsshub/env`
@@ -138,6 +140,7 @@ sudo mkdir -p /data/homelab/lab/infisical/{env,postgres,redis}
 sudo install -d -m 0775 -o 1000 -g 1000 /data/homelab/lab/moviepilot/{config,core,qbittorrent}
 sudo mkdir -p /data/homelab/lab/new-api/data
 sudo mkdir -p /data/homelab/lab/nexus-admin/env
+sudo install -d -m 0700 -o root -g root /data/homelab/lab/portainer/data
 sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale/data
 sudo install -d -m 0755 -o 2999 -g 2999 /data/homelab/lab/radicale-todo/data
 sudo mkdir -p /data/homelab/lab/rsshub/{env,redis}

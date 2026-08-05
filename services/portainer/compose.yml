@@ -1,0 +1,33 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:2.39.2
+    container_name: lab-portainer
+    restart: unless-stopped
+    networks:
+      - lab-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/homelab/lab/portainer/data:/data
+    healthcheck:
+      # The 2.39.2 image is minimal and has no curl/wget. Its bundled Docker
+      # CLI verifies the socket and local engine that Portainer manages.
+      test: ["CMD", "/docker", "version", "--format", "{{.Server.Version}}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      caddy: containers.lab.skywt
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+      labdash.enable: "true"
+      labdash.name: containers
+      labdash.appname: Portainer
+      labdash.url: https://containers.lab.skywt
+      labdash.icon: container
+      labdash.group: Infrastructure
+      labdash.order: "15"
+
+networks:
+  lab-proxy:
+    external: true
