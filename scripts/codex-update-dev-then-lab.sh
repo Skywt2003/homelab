@@ -10,6 +10,9 @@ CURRENT_STAGE="startup"
 # Use the canonical FQDN. The short `proxy` alias intermittently resolves but
 # resets CONNECT traffic on lab, while the FQDN and its Tailnet address work.
 CODEX_PROXY_URL="http://proxy.skynet:10810"
+# A manual run from an active Codex Desktop task may update the lab CLI without
+# restarting the app-server that owns the current conversation.
+SKIP_LAB_APP_SERVER_RESTART="${SKIP_LAB_APP_SERVER_RESTART:-0}"
 
 send_failure_notification() {
   local exit_code="$1" title body payload
@@ -215,6 +218,54 @@ codex_daemon_updater_alive() {
   [ -n "$updater_pid" ] && kill -0 "$updater_pid" 2>/dev/null
 }
 
+pid_state() {
+  local pid="$1"
+  [ -r "/proc/$pid/stat" ] || return 1
+  awk '{ print $3 }' "/proc/$pid/stat"
+}
+
+pid_from_codex_file() {
+  local pid_file="$1"
+  [ -r "$pid_file" ] || return 1
+  sed -n 's/.*"pid":\([0-9][0-9]*\).*/\1/p' "$pid_file" | head -n1
+}
+
+recover_zombie_codex_daemon() {
+  local daemon_dir server_pid updater_pid state attempt
+  daemon_dir="$HOME/.codex/app-server-daemon"
+  server_pid="$(pid_from_codex_file "$daemon_dir/app-server.pid" || true)"
+  [ -n "$server_pid" ] || return 1
+  state="$(pid_state "$server_pid" || true)"
+  [ "$state" = "Z" ] || return 1
+
+  echo "Detected zombie managed Codex app-server pid $server_pid; stopping its updater parent"
+  updater_pid="$(pid_from_codex_file "$daemon_dir/app-server-updater.pid" || true)"
+  if [ -n "$updater_pid" ] && kill -0 "$updater_pid" 2>/dev/null; then
+    kill -TERM "$updater_pid" 2>/dev/null || true
+    for attempt in 1 2 3 4 5 6 7 8 9 10; do
+      kill -0 "$updater_pid" 2>/dev/null || break
+      sleep 1
+    done
+    if kill -0 "$updater_pid" 2>/dev/null; then
+      echo "Updater pid $updater_pid did not stop after SIGTERM; sending SIGKILL"
+      kill -KILL "$updater_pid" 2>/dev/null || true
+    fi
+  fi
+
+  for attempt in 1 2 3 4 5; do
+    [ ! -e "/proc/$server_pid" ] && break
+    sleep 1
+  done
+  if [ -e "/proc/$server_pid" ]; then
+    echo "Zombie managed app-server pid $server_pid was not reaped"
+    return 1
+  fi
+
+  rm -f "$daemon_dir/app-server.pid" "$daemon_dir/app-server-updater.pid"
+  echo "Cleared stale Codex daemon PID files after zombie recovery"
+  return 0
+}
+
 verify_codex_app_server_dev() {
   local attempt
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
@@ -228,6 +279,11 @@ verify_codex_app_server_dev() {
 
 restart_or_bootstrap_codex_app_server_dev() {
   local restart_output rc
+
+  # Codex 0.146.1 can leave its managed app-server as a zombie whose updater
+  # parent never calls wait(2). The daemon's normal restart then waits forever
+  # because the zombie PID still exists. Reap that stale process tree first.
+  recover_zombie_codex_daemon || true
 
   if codex app-server daemon version >/dev/null 2>&1; then
     echo "Restarting managed dev Codex app-server with proxy $CODEX_PROXY_URL"
@@ -281,7 +337,9 @@ REMOTE_DEV_UPDATE
   CURRENT_STAGE="lab update and app-server restart"
   echo "=== Updating lab second ==="
   if codex_update_with_fallback; then
-    if ! restart_codex_app_server_if_managed; then
+    if [ "$SKIP_LAB_APP_SERVER_RESTART" = "1" ]; then
+      echo "Skipping lab app-server restart because SKIP_LAB_APP_SERVER_RESTART=1"
+    elif ! restart_codex_app_server_if_managed; then
       overall_rc=1
     fi
   else
