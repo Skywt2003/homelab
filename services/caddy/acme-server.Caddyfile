@@ -1,5 +1,5 @@
 # Base Caddyfile extended by caddy-docker-proxy.
-# Exposes lab Caddy's built-in ACME server for internal lab/dev names.
+# Exposes lab Caddy's built-in ACME server for selected internal names.
 {
 	# Apple clients do not send SNI for a literal IP address. Use the LAN-IP
 	# certificate for such TLS handshakes so HomePod can call HTTPS by IP.
@@ -20,7 +20,7 @@ acme.lab.skywt {
 		lifetime 72h
 		challenges http-01 tls-alpn-01
 		allow {
-			domains *.lab.skywt *.dev.skywt nas.skywt pve.skywt
+			domains *.lab.skywt *.dev.skywt *.mac-mini.skywt nas.skywt pve.skywt
 			ip_ranges 100.64.0.0/10 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
 		}
 	}
