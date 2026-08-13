@@ -30,7 +30,7 @@ plus Caddy's public root certificate; it does not contain a private key.
 
 ## DNS
 
-AdGuard Home provides:
+mosdns provides:
 
 - `mail.lab.skywt A 100.64.0.2` through the existing `*.lab.skywt` rewrite.
 - `skywt.internal MX 10 mail.lab.skywt.`

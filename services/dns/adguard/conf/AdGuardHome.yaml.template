@@ -30,15 +30,11 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - tls://1.1.1.1
+    - sdns://AQMAAAAAAAAAEjk0LjE0MC4xNC4xNDA6NTQ0MyC16ETWuDo-PhJo62gfvqcN48X6aNvWiBQdvy7AZrLa-iUyLmRuc2NyeXB0LnVuZmlsdGVyZWQubnMxLmFkZ3VhcmQuY29t
   upstream_dns_file: ""
-  bootstrap_dns:
-    - 223.5.5.5
-    - 119.29.29.29
-  fallback_dns:
-    - 223.5.5.5
-    - 119.29.29.29
+  bootstrap_dns: []
+  fallback_dns: []
   upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
@@ -157,6 +153,9 @@ filtering:
       enabled: true
     - domain: '*.dev.skywt'
       answer: 100.64.0.5
+      enabled: true
+    - domain: '*.mac-mini.skywt'
+      answer: 100.64.0.17
       enabled: true
     - domain: nas.skywt
       answer: 100.64.0.12

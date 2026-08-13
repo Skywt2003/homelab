@@ -2,7 +2,7 @@
 
 The PVE host exposes its native `pveproxy` Web UI at `https://pve.skywt`.
 
-- AdGuard resolves `pve.skywt` to the PVE Tailscale address `100.64.0.4`.
+- mosdns resolves `pve.skywt` to the PVE Tailscale address `100.64.0.4`.
 - PVE's built-in ACME client obtains the certificate from
   `https://acme.lab.skywt/acme/local/directory` using the account
   `lab-caddy` and the HTTP-01 challenge.

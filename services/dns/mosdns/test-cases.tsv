@@ -1,0 +1,18 @@
+# category	name	type	note
+override	probe.lab.skywt	A	wildcard lab override
+override	probe.dev.skywt	A	wildcard dev override
+override	probe.mac-mini.skywt	A	wildcard mac-mini override
+override	nas.skywt	A	exact host override
+override	skywt.internal	MX	internal mail record
+apple	apple.com	A	explicit Apple-direct domain
+apple	icloud.com	A	explicit Apple-direct domain
+cn	www.bilibili.com	A	China CDN domain
+cn	api.m.jd.com	A	JD mobile API CDN domain
+cn	www.taobao.com	A	China ecommerce CDN domain
+proxy	chatgpt.com	A	explicit clean-global domain
+proxy	www.google.com	A	blocked/global domain
+unknown	github.com	A	unclassified global service
+unknown	www.microsoft.com	A	unclassified dual lookup
+unknown	example.net	A	unclassified dual lookup
+ipv6	www.bilibili.com	AAAA	IPv6 answer and CN-IP validation
+nxdomain	definitely-not-a-real-name-8f4c2.example	A	negative response behavior

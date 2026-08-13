@@ -11,7 +11,8 @@ Configuration for services running on the `lab` host.
 - `services/ca`: certificate installation guide for `ca.lab.skywt`.
 - `services/calibre-web`: Calibre-Web ebook library for `books.lab.skywt`.
 - `services/caddy`: shared Caddy reverse proxy and internal ACME endpoint for lab services.
-- `services/dns`: AdGuard Home DNS stack for `dns.lab.skywt`.
+- `services/dns`: production mosdns resolver with an alternate AdGuard Home
+  resolver and the `dns.lab.skywt` administration UI.
 - `services/docker-registry`: Docker Registry for `docker.lab.skywt`.
 - `services/gitea`: Gitea for `git.lab.skywt`.
 - `services/grafana`: Grafana for `grafana.lab.skywt`.
@@ -78,6 +79,9 @@ Current paths:
 - `/data/homelab/lab/android-scrcpy/adb`
 - `/data/homelab/lab/adguard/conf`
 - `/data/homelab/lab/adguard/work`
+- `/data/homelab/lab/mosdns/cache`
+- `/data/homelab/lab/mosdns/rules`
+- `/data/homelab/lab/mosdns/backups`
 - `/data/homelab/lab/apprise-api/config`
 - `/data/homelab/lab/apprise-api/attach`
 - `/data/homelab/lab/apprise-api/plugin`

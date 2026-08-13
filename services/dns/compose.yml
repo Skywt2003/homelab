@@ -4,8 +4,11 @@ services:
     container_name: lab-adguard
     restart: unless-stopped
     ports:
-      - "100.64.0.2:53:53/tcp"
-      - "100.64.0.2:53:53/udp"
+      # mosdns is the production resolver on port 53. Keep AdGuard's DNS
+      # listener available on an explicit alternate port for comparison and
+      # emergency rollback; its web UI remains on the lab-proxy network.
+      - "100.64.0.2:5354:53/tcp"
+      - "100.64.0.2:5354:53/udp"
     networks:
       - lab-proxy
     volumes:
@@ -28,6 +31,31 @@ services:
       labdash.icon: shield-check
       labdash.group: Infrastructure
       labdash.order: "30"
+
+  mosdns:
+    image: irinesistiana/mosdns:v5.3.4
+    container_name: lab-mosdns
+    restart: unless-stopped
+    network_mode: host
+    command: ["start", "-c", "/etc/mosdns/config.yaml"]
+    read_only: true
+    cap_drop:
+      - ALL
+    # Required only for the production DNS listener on privileged port 53.
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./mosdns/config.yaml:/etc/mosdns/config.yaml:ro
+      - /data/homelab/lab/mosdns/rules:/etc/mosdns/rules:ro
+      - /data/homelab/lab/mosdns/cache:/var/cache/mosdns
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9092/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   lab-proxy:

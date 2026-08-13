@@ -8,7 +8,8 @@ This SOP describes how to add and deploy a new service on the `lab` host.
 - One service stack lives under `services/<service>/`.
 - Public HTTPS access is handled by the shared Caddy Docker proxy stack.
 - Service routes use the shared external Docker network `lab-proxy`.
-- Local lab domains use `*.lab.skywt`, currently resolved by AdGuard Home.
+- Local lab domains use `*.lab.skywt`, currently resolved by mosdns on the
+  Tailnet DNS endpoint `100.64.0.2:53`.
 - Runtime data that should not be maintained in Git lives under `/data/homelab/lab`.
 - Real secrets are managed by Infisical at `https://secrets.lab.skywt` and mounted into containers through Docker Compose secrets. See [Secret Management SOP](secret-management-sop.md).
 
